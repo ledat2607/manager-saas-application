@@ -29,7 +29,7 @@ const features = [
 export default function WhyTaskManager() {
   const { t } = useTranslation();
   return (
-    <section className="relative mx-auto max-w-7xl px-6 py-24">
+    <section className="relative mx-auto max-w-7xl px-6 py-24 ">
       {/* ===== Title ===== */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -83,7 +83,7 @@ export default function WhyTaskManager() {
                   </div>
 
                   <h3 className="text-lg font-semibold text-foreground">
-                     {t(item.titleKey)}
+                    {t(item.titleKey)}
                   </h3>
 
                   <p className="text-sm text-muted-foreground">

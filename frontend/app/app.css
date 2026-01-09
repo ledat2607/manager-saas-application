@@ -85,7 +85,7 @@ body {
   --radius: 0.625rem;
 
   /* Base */
-  --background: oklch(89.633% 0.01097 16.851);
+  --background: oklch(94.028% 0.00864 16.631 / 0.76);
   --foreground: oklch(0.18 0.03 260);
 
   --card: oklch(0.995 0.002 260);

@@ -37,36 +37,38 @@ const NavBarUser = () => {
         w-full
       "
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
-        {/* Logo & Title */}
-        <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center">
-            <img
-              src="/logoTM.png"
-              alt="Task Manager"
-              className="h-16 sm:h-20 w-auto object-contain"
-            />
-          </Link>
-
-          <span className="-ml-4 hidden gap-2 text-2xl font-bold lg:flex">
-            Task
-            <span className="bg-linear-to-r from-indigo-400 via-sky-400 to-purple-500 bg-clip-text text-transparent">
-              Manager
-            </span>
-          </span>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-4">
-          <Link to={"/sign-in"}>
-            <Button variant="primary" className="cursor-pointer">
-              {t("login")}
-            </Button>
-          </Link>
-
+      <div className="w-full">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-2">
+          {/* Logo & Title */}
           <div className="flex items-center gap-4">
-            <LanguageSwitch />
-            <ModeToggle />
+            <Link to="/" className="flex items-center">
+              <img
+                src="/logoTM.png"
+                alt="Task Manager"
+                className="h-16 sm:h-20 w-auto object-contain"
+              />
+            </Link>
+
+            <span className="-ml-4 hidden gap-2 text-2xl font-bold lg:flex">
+              Task
+              <span className="bg-linear-to-r from-indigo-400 via-sky-400 to-purple-500 bg-clip-text text-transparent">
+                Manager
+              </span>
+            </span>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-4">
+            <Link to={"/sign-in"}>
+              <Button variant="primary" className="cursor-pointer">
+                {t("login")}
+              </Button>
+            </Link>
+
+            <div className="flex items-center gap-4">
+              <LanguageSwitch />
+              <ModeToggle />
+            </div>
           </div>
         </div>
       </div>

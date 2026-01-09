@@ -14,6 +14,13 @@ import "./app.css";
 import "./i18n";
 import { ThemeProvider } from "./components/home_component/theme-provider";
 
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "Task Manager" },
+    { name: "description", content: "Welcome to Task Manager Application!" },
+  ];
+}
+
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -36,9 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="p-0.5">
+      <body className="min-h-screen bg-background">
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-          {children}
+          <div className="min-h-screen flex flex-col">{children}</div>
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
