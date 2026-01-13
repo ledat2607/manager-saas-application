@@ -1,9 +1,17 @@
-// routes/auth/auth-layout.tsx
-import { Outlet, useLocation } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthGradientPanel from "./_components/auth-gradient-panel";
+import { userAuth } from "@/provider/auth-context";
 
 export default function AuthLayout() {
+  const { isAuthenticated, isLoading } = userAuth();
+  if (isLoading) {
+    return <div>Loading....</div>;
+  }
+  if (isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+
   const location = useLocation();
   const isSignUp = location.pathname.includes("sign-up");
 

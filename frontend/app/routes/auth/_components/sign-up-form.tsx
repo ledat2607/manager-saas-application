@@ -25,11 +25,13 @@ import { Link } from "react-router";
 import type z from "zod";
 import { usePasswordValidation } from "hook/use-password-validation";
 
+export type SignUpFormData = z.infer<typeof signUpSchema>;
+
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
-  const form = useForm<z.infer<typeof signUpSchema>>({
+  const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",

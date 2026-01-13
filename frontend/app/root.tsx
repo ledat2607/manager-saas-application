@@ -13,6 +13,8 @@ import "./app.css";
 //switch language files
 import "./i18n";
 import { ThemeProvider } from "./components/home_component/theme-provider";
+import ReactQueryProvider from "./provider/react-query-provider";
+import { Toaster } from "./components/ui/sonner";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -59,7 +61,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ReactQueryProvider>
+      <Outlet />
+      <Toaster position="bottom-right" richColors />
+    </ReactQueryProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
