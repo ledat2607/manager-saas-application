@@ -21,6 +21,7 @@ import {
   Github,
   Chrome,
   Facebook,
+  Home,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type z from "zod";
@@ -34,7 +35,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { motion } from "framer-motion";
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -51,10 +51,10 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full">
-      <div className="flex w-full max-w-4xl rounded-xl overflow-hidden shadow-lg dark:shadow-white border-2 dark:border-white">
+    <div className="flex flex-col justify-center items-center w-full">
+      <div className="flex w-full rounded-xl overflow-hidden">
         {/* Left - Form */}
-        <div className="flex-1 p-8 bg-background">
+        <div className="flex-1 p-1 bg-background">
           <Card className="border border-border/20 dark:border-border/50 shadow-md">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold">
@@ -184,24 +184,15 @@ const SignInForm = () => {
             </CardContent>
           </Card>
         </div>
-
-        {/* Right - Image */}
-        <div className="hidden lg:relative lg:flex flex-1 overflow-hidden">
-          <motion.img
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            src="./gradient.jpg"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-linear-to-l from-background/80 via-background/20 to-transparent" />
-
-          {/* Soft noise */}
-          <div className="absolute inset-0 opacity-[0.06] bg-[url('/noise.png')]" />
-        </div>
       </div>
+      <Link
+        to="/"
+        className="text-balance truncate text-muted-foreground text-sm underline pt-8"
+      >
+        <Button variant={'outline'}>
+          <Home className="h-4 w-4" />
+        </Button>
+      </Link>
     </div>
   );
 };

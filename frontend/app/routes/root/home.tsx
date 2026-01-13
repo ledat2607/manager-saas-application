@@ -4,8 +4,8 @@ import HowItWorks from "@/components/home_component/how-it-works";
 import Testimonials from "@/components/home_component/testimonials";
 import FinalCTA from "@/components/home_component/cta";
 import Footer from "@/components/home_component/footer";
-import type { Route } from "./+types/home";
 import Hero from "@/components/home_component/hero";
+import type { Route } from "./+types/home";
 
 /* ================= TITLE ================= */
 export function meta({}: Route.MetaArgs) {
