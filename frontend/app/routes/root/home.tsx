@@ -6,6 +6,7 @@ import FinalCTA from "@/components/home_component/cta";
 import Footer from "@/components/home_component/footer";
 import Hero from "@/components/home_component/hero";
 import type { Route } from "./+types/home";
+import { userAuth } from "@/provider/auth-context";
 
 /* ================= TITLE ================= */
 export function meta({}: Route.MetaArgs) {
@@ -17,10 +18,11 @@ export function meta({}: Route.MetaArgs) {
 
 /* ================= HOME PAGE ================= */
 const HomePage = () => {
+  const { user } = userAuth();
 
   return (
     <div className="flex flex-col space-y-24 justify-between w-full">
-      <NavBarUser />
+      <NavBarUser user={user} />
 
       {/* ===== Hero Section ===== */}
       <Hero />

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import {
   Eye,
@@ -22,6 +22,8 @@ import {
   Chrome,
   Facebook,
   Home,
+  Loader2,
+  Send,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type z from "zod";
@@ -35,8 +37,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useSignInMutation } from "hook/use-auth";
+import { toast } from "sonner";
+import { userAuth } from "@/provider/auth-context";
 
 const SignInForm = () => {
+  const { mutate, isPending } = useSignInMutation();
+  const { login } = userAuth();
+  const navigation = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -47,7 +55,18 @@ const SignInForm = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof signInSchema>) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: (data: any) => {
+        toast.success(data.message || "Đăng nhập thành công");
+        login(data);
+        form.reset();
+        navigation("/dashboard");
+      },
+      onError: (error: any) => {
+        const errMess = error.response?.data?.message;
+        toast.error(errMess || "Đăng nhập thất bại");
+      },
+    });
   };
 
   return (
@@ -128,6 +147,7 @@ const SignInForm = () => {
                             <div className="relative">
                               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input
+                                {...field}
                                 id="password"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
@@ -155,7 +175,17 @@ const SignInForm = () => {
                   />
 
                   <Button type="submit" className="w-full">
-                    Login
+                    {isPending ? (
+                      <div className="flex items-center gap-4">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <p>Signing....</p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-4">
+                        <Send className="w-4 h-4" />
+                        <span>Sign In</span>
+                      </div>
+                    )}
                   </Button>
                 </form>
               </Form>
@@ -189,7 +219,7 @@ const SignInForm = () => {
         to="/"
         className="text-balance truncate text-muted-foreground text-sm underline pt-8"
       >
-        <Button variant={'outline'}>
+        <Button variant={"outline"}>
           <Home className="h-4 w-4" />
         </Button>
       </Link>

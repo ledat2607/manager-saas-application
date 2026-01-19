@@ -7,6 +7,10 @@ i18n.use(initReactI18next).init({
       translation: {
         welcome: "Welcome",
         login: "Login",
+        logout: " Logout",
+        dashboard: " Dashboard",
+        profile: " Profile",
+        settings: " Settings",
         slogan: "Manage your work with",
         description:
           " A modern project management platform with clarity, speed, and collaboration at its core.",
@@ -57,6 +61,10 @@ i18n.use(initReactI18next).init({
       translation: {
         welcome: "Chào mừng",
         login: "Đăng nhập",
+        logout: " Đăng xuất",
+        dashboard: " Quản lý",
+        profile: " Thông tin cá nhân",
+        settings: " Cài đặt",
         slogan: "Quản lý công việc của bạn với",
         description:
           " Một nền tảng quản lý dự án hiện đại với sự rõ ràng, tốc độ và hợp tác là cốt lõi.",

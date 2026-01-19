@@ -18,16 +18,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { signUpSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Lock, Mail, PersonStanding } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail, PersonStanding } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import type z from "zod";
 import { usePasswordValidation } from "hook/use-password-validation";
+import { useSignUpMuatation } from "hook/use-auth";
+import { toast } from "sonner";
 
 export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const SignUpForm = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
@@ -48,8 +51,20 @@ const SignUpForm = () => {
   const passwordValidation = usePasswordValidation(password, confirmPassword);
 
   // Handle form submission
+  const { mutate, isPending } = useSignUpMuatation();
   const handleSubmit = (values: z.infer<typeof signUpSchema>) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: () => {
+        toast.success(
+          "Account created successfully! Please check your email to verify your account."
+        );
+        form.reset();
+        navigate("/sign-in");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Something went wrong. Please try again.");
+      },
+    });
   };
   return (
     <div className="flex flex-col justify-center items-center w-full">
@@ -58,9 +73,7 @@ const SignUpForm = () => {
         <div className="flex-1 p-1 bg-background">
           <Card className="border border-border/20 dark:border-border/50 shadow-md">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold">
-                Welcome 👋
-              </CardTitle>
+              <CardTitle className="text-2xl font-bold">Welcome 👋</CardTitle>
               <CardDescription className="text-sm">
                 Sign up your account to get started.
               </CardDescription>
@@ -225,10 +238,18 @@ const SignUpForm = () => {
                     disabled={
                       !passwordValidation.isStrong ||
                       !passwordValidation.isMatch ||
-                      form.formState.isSubmitting
+                      form.formState.isSubmitting ||
+                      isPending
                     }
                   >
-                    Create account
+                    {isPending ? (
+                      <div className="flex items-center justify-between">
+                        <span>Creating Account</span>
+                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                      </div>
+                    ) : (
+                      <span>Create Account</span>
+                    )}
                   </Button>
                 </form>
               </Form>

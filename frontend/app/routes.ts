@@ -9,6 +9,11 @@ export default [
   // ===== MAIN APP ROUTES (KHÔNG CÓ LAYOUT) =====
   index("routes/root/home.tsx"),
 
+  //===Dashboard===
+  layout("routes/dashboard/dashboard-layout.tsx", [
+    route("dashboard", "routes/dashboard/index.tsx"),
+  ]),
+
   // ===== AUTH LAYOUT =====
   layout("routes/auth/auth-layout.tsx", [
     route("sign-in", "routes/auth/sign-in.tsx"),
