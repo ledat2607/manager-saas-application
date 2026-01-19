@@ -22,3 +22,10 @@ export const useSignInMutation = () => {
       postData("/auth/login", data),
   });
 };
+
+export const useResetPasswordRequest = () => {
+  return useMutation({
+    mutationFn: (data: { email: string }) =>
+      postData("/auth/reset-password-request", data),
+  });
+};

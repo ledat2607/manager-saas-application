@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Verification from "../models/verification.js";
 import mongoose from "mongoose";
-import sendVerificationEmail from "../libs/send-email.js";
+import {
+  sendRecoveryEmail,
+  sendVerificationEmail,
+} from "../libs/send-email.js";
 
 //register funcion
 const registerUser = async (req, res) => {
@@ -131,7 +134,7 @@ const loginUser = async (req, res) => {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid password" });
     }
@@ -202,4 +205,108 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, verifyEmail };
+const resetPasswordRequest = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    if (user.isEmailVerified === false) {
+      return res.status(400).json({
+        message: "Please verify your email before resetting password",
+      });
+    }
+
+    const existingVerification = await Verification.findOne({
+      userId: user._id,
+    });
+
+    if (existingVerification && existingVerification.expiryDate > new Date()) {
+      await Verification.findByIdAndDelete(existingVerification._id);
+    }
+
+    const resetToken = jwt.sign(
+      {
+        userId: user._id,
+        type: "password-reset",
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" },
+    );
+
+    await Verification.create({
+      userId: user._id,
+      token: resetToken,
+      expiryDate: new Date(Date.now() + 1 * 60 * 60 * 1000),
+    });
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    // Gửi email đặt lại mật khẩu
+    await sendRecoveryEmail(user.email, user.name, resetLink);
+    res.status(200).json({ message: "Password reset email sent" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const verifyTokenAndResetPassword = async (req, res) => {
+  try {
+    const { token, newPassword, confirmNewPassword } = req.body;
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!payload) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const { userId, type } = payload;
+
+    if (type !== "password-reset") {
+      return res.status(400).json({ message: "Invalid token type" });
+    }
+
+    const verificationRecord = await Verification.findOne({ userId, token });
+
+    if (!verificationRecord) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const isTokenExpired = verificationRecord.expiryDate < new Date();
+
+    if (isTokenExpired) {
+      return res.status(400).json({ message: "Token has expired" });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.password = hashedPassword;
+    await user.save();
+
+    await Verification.findByIdAndDelete(verificationRecord._id);
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export {
+  registerUser,
+  loginUser,
+  verifyEmail,
+  resetPasswordRequest,
+  verifyTokenAndResetPassword,
+};
