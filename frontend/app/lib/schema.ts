@@ -33,16 +33,19 @@ export const signUpSchema = z
 
 export const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, "Password must be at least 8 characters long"),
-    confirmPassword: z
+    token: z.string(),
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters long"),
+    confirmNewPassword: z
       .string()
       .min(8, "Password must be at least 8 characters long"),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    path: ["confirmNewPassword"],
     message: "Passwords do not match",
   });
 
-  export const forgortPasswordSchema = z.object({
-    email: z.string().min(1).email("Invalid email address"),
-  });
+export const forgortPasswordSchema = z.object({
+  email: z.string().min(1).email("Invalid email address"),
+});

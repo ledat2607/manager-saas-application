@@ -12,6 +12,7 @@ export default [
   //===Dashboard===
   layout("routes/dashboard/dashboard-layout.tsx", [
     route("dashboard", "routes/dashboard/index.tsx"),
+    route("workspaces", "routes/dashboard/workspace.tsx"),
   ]),
 
   // ===== AUTH LAYOUT =====

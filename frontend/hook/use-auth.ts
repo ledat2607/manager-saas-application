@@ -29,3 +29,13 @@ export const useResetPasswordRequest = () => {
       postData("/auth/reset-password-request", data),
   });
 };
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: (data: {
+      token: string;
+      newPassword: string;
+      confirmNewPassword: string;
+    }) => postData("/auth/reset-password", data),
+  });
+};

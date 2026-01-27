@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("selectedWorkspaceId");
     setUser(null);
     setIsAuthenticated(false);
     queryClientConfig.clear();

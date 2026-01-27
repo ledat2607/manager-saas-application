@@ -13,13 +13,13 @@ import { LayoutDashboard, LogOut, Settings, UserIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { userAuth } from "@/provider/auth-context";
 import { useTranslation } from "node_modules/react-i18next";
+import { Badge } from "../ui/badge";
 
 interface UserMenuProps {
   user: User | null;
 }
 
 const UserMenu = ({ user }: UserMenuProps) => {
-  console.log(user);
   const navigate = useNavigate();
   const { logout } = userAuth();
 
@@ -34,14 +34,20 @@ const UserMenu = ({ user }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-10 w-10 rounded-full ring-2 ring-primary/10"
+          className="relative h-8 w-8 rounded-full ring-2 ring-primary/10"
         >
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={user?.profilePictureUrl} alt={user?.name} />
-            <AvatarFallback className="bg-blue-500 text-white">
-              {user?.name?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative inline-block">
+            {/* Avatar chính */}
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.profilePictureUrl} alt={user?.name} />
+              <AvatarFallback className="bg-blue-500 text-white text-xs">
+                {user?.name?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Badge trạng thái (Online) */}
+            <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-background" />
+          </div>
         </Button>
       </DropdownMenuTrigger>
 

@@ -49,7 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="min-h-screen bg-background">
+      <body className="min-h-screen bg-background" suppressHydrationWarning>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <div className="min-h-screen flex flex-col">{children}</div>
         </ThemeProvider>

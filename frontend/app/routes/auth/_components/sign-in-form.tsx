@@ -136,7 +136,7 @@ const SignInForm = () => {
                           >
                             Password
                             <a
-                              href="#"
+                              href="/forgot-password"
                               className="ml-auto text-xs text-muted-foreground hover:underline"
                             >
                               Forgot password?
