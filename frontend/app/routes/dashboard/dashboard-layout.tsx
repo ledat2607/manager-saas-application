@@ -1,17 +1,29 @@
 import { userAuth } from "@/provider/auth-context";
 import React, { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useParams } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeaderDashboard from "@/components/dashboard_component/header";
 import type { Workspace } from "@/types";
 import Sidebar from "@/components/dashboard_component/sidebar";
 import { Separator } from "@/components/ui/separator";
+import CreateWorkspace from "@/components/dashboard_component/workspace/create-workspace";
+import { getData } from "@/lib/fetch-utils";
+import { useSearchParams } from "react-router";
+
+export const clientLoader = async () => {
+  try {
+    // Chỉ cần lấy thẳng data từ API trả về
+    const data = await getData("/workspaces");
+    return data; // Trả về object { workspaces: [...] }
+  } catch (error) {
+    console.error(error);
+    return { workspaces: [] };
+  }
+};
 
 const DashboardLayout = () => {
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState(false);
 
-  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const {
     user,
@@ -38,11 +50,7 @@ const DashboardLayout = () => {
   if (!isAuthenticated) {
     return <Navigate to={"/sign-in"} />;
   }
-
-  const handleSelectedWorkspace = (workspace: Workspace) => {
-    setCurrentWorkspace(workspace);
-  };
-
+ 
   return (
     <div className="flex h-screen w-full gap-2">
       {/*Sidebar */}
@@ -70,6 +78,10 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
+      <CreateWorkspace
+        isCreatingWorkspace={isCreatingWorkspace}
+        setIsCreatingWorkspace={setIsCreatingWorkspace}
+      />
     </div>
   );
 };

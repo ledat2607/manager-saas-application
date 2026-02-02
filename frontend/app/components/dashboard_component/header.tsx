@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Bell, PlusCircle, Search, Check } from "lucide-react";
+import { useEffect } from "react";
+import { Bell, PlusCircle, Search, Check, PenLine } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -12,54 +12,31 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import UserMenu from "../home_component/user-menu";
-import WorkspaceAvatar from "./workspace-avatar";
-import { useLocalStorage } from "hook/use-localStorage";
+import WorkspaceAvatar from "./workspace/workspace-avatar";
 import type { User, Workspace } from "@/types";
+import { useLoaderData, useNavigate, useParams } from "react-router";
 
 interface HeaderDashboardProps {
   user: User | null;
   onCreateWorkspace: () => void;
 }
 
-const workspacesData: Workspace[] = [
-  {
-    _id: "ws-01",
-    name: "Design Team",
-    color: "#8B5CF6",
-    workspacePicture: "https://api.dicebear.com/7.x/initials/svg?seed=Design",
-    owner: "user-01",
-    members: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "ws-02",
-    name: "Marketing",
-    color: "#EC4899",
-    workspacePicture:
-      "https://api.dicebear.com/7.x/initials/svg?seed=Marketing",
-    owner: "user-02",
-    members: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
 const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
-  // Sử dụng Hook để lưu ID của workspace đã chọn
-  const [selectedId, setSelectedId] = useLocalStorage<string | null>(
-    "selectedWorkspaceId",
-    workspacesData[0]?._id,
-  );
+  const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
+  const navigate = useNavigate();
+  const params = useParams();
 
-  // Tìm đối tượng workspace tương ứng với ID đang lưu
+  const selectedId = params.workspaceId;
+
+  // Tìm workspace tương ứng, nếu không có id trên URL thì lấy cái đầu tiên
   const selectedWorkspace =
-    workspacesData.find((ws) => ws._id === selectedId) || workspacesData[0];
+    workspaces?.length > 0
+      ? workspaces.find((ws) => ws._id === selectedId) || workspaces[0]
+      : null;
 
   const handleSelect = (ws: Workspace) => {
-    setSelectedId(ws._id);
+    navigate(`/workspaces/${ws._id}`);
   };
-
   return (
     <div className="sticky top-0 bg-background/80 backdrop-blur-md z-40 border-b justify-between flex items-center p-3.5">
       <DropdownMenu>
@@ -80,7 +57,10 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
                 </span>
               </>
             ) : (
-              <span>Select workspace</span>
+              <span className="text-muted-foreground flex gap-3 items-center">
+                <PenLine className="w-4 h-4" />
+                Select workspaces
+              </span>
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -92,29 +72,37 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
           <DropdownMenuSeparator className="my-2" />
 
           <DropdownMenuGroup>
-            {workspacesData.map((ws) => (
-              <DropdownMenuItem
-                key={ws._id}
-                onClick={() => handleSelect(ws)}
-                className={`flex items-center gap-3 p-2 rounded-md cursor-pointer mb-1 transition-all ${
-                  selectedId === ws._id ? "bg-accent" : "hover:bg-accent/50"
-                }`}
-              >
-                <WorkspaceAvatar
-                  color={ws.color}
-                  name={ws.name}
-                  pictureUrl={ws.workspacePicture}
-                />
-                <span
-                  className={`flex-1 font-medium ${selectedId === ws._id ? "text-primary" : ""}`}
-                >
-                  {ws.name}
-                </span>
-                {selectedId === ws._id && (
-                  <Check className="w-4 h-4 text-primary animate-in zoom-in duration-300" />
-                )}
-              </DropdownMenuItem>
-            ))}
+            {workspaces?.length > 0 ? (
+              <>
+                {workspaces?.map((ws) => (
+                  <DropdownMenuItem
+                    key={ws._id}
+                    onClick={() => handleSelect(ws)}
+                    className={`flex items-center gap-3 p-2 rounded-md cursor-pointer mb-1 transition-all ${
+                      selectedId === ws._id ? "bg-accent" : "hover:bg-accent/50"
+                    }`}
+                  >
+                    <WorkspaceAvatar
+                      color={ws.color}
+                      name={ws.name}
+                      pictureUrl={ws.workspacePicture}
+                    />
+                    <span
+                      className={`flex-1 font-medium ${selectedId === ws._id ? "text-primary" : ""}`}
+                    >
+                      {ws.name}
+                    </span>
+                    {selectedId === ws._id && (
+                      <Check className="w-4 h-4 text-primary animate-in zoom-in duration-300" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </>
+            ) : (
+              <div className="p-4 text-center text-xs text-muted-foreground">
+                You don't have any workspaces yet.
+              </div>
+            )}
           </DropdownMenuGroup>
 
           <DropdownMenuSeparator className="my-2" />

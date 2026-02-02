@@ -18,6 +18,7 @@ export const verifyEmailSchema = z.object({
 export const recoveryEmailSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
+
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, "Token is required"),
   newPassword: z
@@ -26,4 +27,11 @@ export const resetPasswordSchema = z.object({
   confirmNewPassword: z
     .string()
     .min(8, "Confirm password must be at least 8 characters long"),
+});
+
+export const createWorkspaceSchema = z.object({
+  name: z.string().min(4, "Workspace name must be at least 4 characters long"),
+  description: z.string(),
+  color: z.string(),
+  workspacePicture: z.string(),
 });
