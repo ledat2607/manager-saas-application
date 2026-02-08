@@ -2,7 +2,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  profilePictureUrl?: string;
+  profilePicture?: string;
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;

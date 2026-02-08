@@ -1,14 +1,13 @@
 import { userAuth } from "@/provider/auth-context";
 import React, { useEffect, useState } from "react";
-import { Navigate, Outlet, useParams } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeaderDashboard from "@/components/dashboard_component/header";
-import type { Workspace } from "@/types";
+
 import Sidebar from "@/components/dashboard_component/sidebar";
 import { Separator } from "@/components/ui/separator";
 import CreateWorkspace from "@/components/dashboard_component/workspace/create-workspace";
 import { getData } from "@/lib/fetch-utils";
-import { useSearchParams } from "react-router";
 
 export const clientLoader = async () => {
   try {
@@ -50,7 +49,7 @@ const DashboardLayout = () => {
   if (!isAuthenticated) {
     return <Navigate to={"/sign-in"} />;
   }
- 
+
   return (
     <div className="flex h-screen w-full gap-2">
       {/*Sidebar */}

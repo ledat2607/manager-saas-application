@@ -11,8 +11,13 @@ import { userAuth } from "@/provider/auth-context";
 /* ================= TITLE ================= */
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Task Manager" },
-    { name: "description", content: "Welcome to Task Manager Application!" },
+    { title: "Task Manager - Quản lý công việc hiệu quả" },
+    {
+      name: "description",
+      content: "Nền tảng quản lý task tối ưu cho nhóm nhỏ.",
+    },
+    { property: "og:image", content: "/og-image.png" }, // Ảnh xem trước
+    { property: "og:type", content: "website" },
   ];
 }
 

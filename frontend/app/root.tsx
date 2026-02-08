@@ -15,6 +15,9 @@ import "./i18n";
 import { ThemeProvider } from "./components/home_component/theme-provider";
 import ReactQueryProvider from "./provider/react-query-provider";
 import { Toaster } from "./components/ui/sonner";
+import AuthLayout from "./routes/auth/auth-layout";
+import { userAuth } from "./provider/auth-context";
+import { SocketProvider } from "./context/socket-context";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -60,11 +63,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function SocketWrapper({ children }: { children: React.ReactNode }) {
+  const { user } = userAuth();
+  // Truyền user?._id vào, SocketProvider sẽ tự đợi đến khi có id mới connect
+  return <SocketProvider userId={user?._id as any}>{children}</SocketProvider>;
+}
+
 export default function App() {
   return (
     <ReactQueryProvider>
-      <Outlet />
-      <Toaster position="bottom-right" richColors />
+      <SocketWrapper>
+        <Outlet />
+        <Toaster position="bottom-right" richColors />
+      </SocketWrapper>
     </ReactQueryProvider>
   );
 }

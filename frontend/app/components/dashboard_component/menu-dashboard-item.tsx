@@ -35,7 +35,7 @@ const MenuDashboardItem = ({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="absolute inset-0 z-0 rounded-xl bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 shadow-lg shadow-blue-500/20"
+            className="absolute inset-0 z-0 rounded-xl bg-linear-to-r from-blue-600 via-purple-500 to-pink-500 shadow-lg shadow-blue-500/20"
           />
         )}
       </AnimatePresence>

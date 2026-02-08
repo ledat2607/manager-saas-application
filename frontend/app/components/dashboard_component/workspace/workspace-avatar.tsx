@@ -11,7 +11,7 @@ interface WorkspaceAvatarProps {
 const WorkspaceAvatar = ({ name, color, pictureUrl }: WorkspaceAvatarProps) => {
   return (
     <div
-      className="w-8 h-8 rounded flex items-center justify-center overflow-hidden shrink-0 rounded-full"
+      className="w-8 h-8 flex items-center justify-center overflow-hidden shrink-0 rounded-full"
       style={{ backgroundColor: !pictureUrl ? color : "transparent" }} // Set màu ở đây
     >
       {pictureUrl ? (

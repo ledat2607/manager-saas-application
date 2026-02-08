@@ -143,9 +143,11 @@ const loginUser = async (req, res) => {
     });
 
     user.lastLogin = new Date();
+
     await user.save();
 
     const userData = user.toObject();
+    
     delete userData.password;
     res
       .status(200)

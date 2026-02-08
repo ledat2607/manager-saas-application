@@ -16,7 +16,6 @@ const createWorkspace = async (req, res) => {
         },
       ],
     });
-    console.log(workspace);
     res.status(201).json({
       success: true,
       message: "Create workspace successfull !",
@@ -34,8 +33,14 @@ const getWorkspaces = async (req, res) => {
   try {
     const workspaces = await Workspace.find({
       "members.user": req.user._id,
-    }).sort({ createdAt: -1 });
-    res.status(201).json({ workspaces });
+    })
+      .populate({
+        path: "members.user", // 1. Chỉ định trường chứa ID cần populate
+        select: "name email profilePicture", // 2. Chỉ lấy các trường cần thiết (bảo mật)
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ workspaces }); // Thường lấy dữ liệu dùng 200 (OK) thay vì 201 (Created)
   } catch (error) {
     console.log(error);
     return res.status(500).json({

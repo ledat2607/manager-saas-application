@@ -27,16 +27,13 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
   const params = useParams();
 
   const selectedId = params.workspaceId;
-
-  // Tìm workspace tương ứng, nếu không có id trên URL thì lấy cái đầu tiên
-  const selectedWorkspace =
-    workspaces?.length > 0
-      ? workspaces.find((ws) => ws._id === selectedId) || workspaces[0]
-      : null;
+  // Tìm workspace dựa trên URL, nếu không khớp thì trả về undefined
+  const selectedWorkspace = workspaces?.find((ws) => ws._id === selectedId);
 
   const handleSelect = (ws: Workspace) => {
     navigate(`/workspaces/${ws._id}`);
   };
+  console.log(user);
   return (
     <div className="sticky top-0 bg-background/80 backdrop-blur-md z-40 border-b justify-between flex items-center p-3.5">
       <DropdownMenu>
