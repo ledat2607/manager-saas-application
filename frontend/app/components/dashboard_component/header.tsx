@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { Bell, PlusCircle, Search, Check, PenLine } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -26,14 +26,17 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const selectedId = params.workspaceId;
-  // Tìm workspace dựa trên URL, nếu không khớp thì trả về undefined
-  const selectedWorkspace = workspaces?.find((ws) => ws._id === selectedId);
+  
+  const selectedId = params.workspacesId || params.id;
+  const selectedWorkspace = useMemo(() => {
+    return workspaces?.find((ws) => ws._id === selectedId);
+  }, [selectedId, workspaces]);
 
   const handleSelect = (ws: Workspace) => {
     navigate(`/workspaces/${ws._id}`);
   };
-  console.log(user);
+
+
   return (
     <div className="sticky top-0 bg-background/80 backdrop-blur-md z-40 border-b justify-between flex items-center p-3.5">
       <DropdownMenu>

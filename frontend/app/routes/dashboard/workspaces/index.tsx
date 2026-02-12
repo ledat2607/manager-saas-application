@@ -1,9 +1,9 @@
 import CreateWorkspace from "@/components/dashboard_component/workspace/create-workspace";
+import { WorkspaceChartPieDonutActive } from "@/components/dashboard_component/workspace/rechart";
 import WorkspaceAvatar from "@/components/dashboard_component/workspace/workspace-avatar";
 import NoDataFound from "@/components/noData-found";
 import {
   Avatar,
-  AvatarBadge,
   AvatarFallback,
   AvatarGroup,
   AvatarGroupCount,
@@ -28,7 +28,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Workspace } from "@/types";
-import { useGetWorkspaceQuery } from "hook/use-worksapce";
+import { useGetWorkspacesQuery } from "hook/use-worksapce";
 import {
   Eye,
   MoreHorizontal,
@@ -38,18 +38,18 @@ import {
   Trash,
 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 
 const Workspace = () => {
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
 
-  const { data, isLoading } = useGetWorkspaceQuery() as any;
+  const { data, isLoading } = useGetWorkspacesQuery() as any;
 
   // Sau đó lấy mảng ra để map
   const workspaces = (data?.workspaces as Workspace[]) || [];
   if (isLoading) {
     return <WorkspaceSkeleton />;
   }
-  console.log(workspaces[0].members);
   return (
     <>
       <div className="space-y-6">
@@ -107,66 +107,83 @@ const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
   const ownerMember = workspace.members.find((m) => m.role === "owner");
   const ownerUser = ownerMember?.user;
   return (
-    <Card className="bg-background rounded-lg shadow-xs hover:shadow-lg shadow-gray-300 transition-shadow duration-200 hover:cursor-pointer p-2">
-      <CardHeader className="px-1 py-0">
-        <div className="flex items-center justify-between">
-          <WorkspaceAvatar
-            pictureUrl={workspace.workspacePicture}
-            name={workspace.name}
-            color={workspace.color}
-          />
-          <div>
-            <h3 className="text-lg font-semibold">{workspace.name}</h3>
-            <CardDescription className="text-balance truncate text-sm">
-              {workspace.description}
-            </CardDescription>
+    <Link to={`/workspaces/${workspace._id}`}>
+      <Card className="bg-background rounded-lg shadow-xs hover:shadow-lg shadow-gray-300 transition-shadow duration-200 hover:cursor-pointer p-2">
+        <CardHeader className="px-1 py-0">
+          <div className="flex items-center justify-between">
+            <WorkspaceAvatar
+              pictureUrl={workspace.workspacePicture}
+              name={workspace.name}
+              color={workspace.color}
+            />
+            <div>
+              <h3 className="text-lg font-semibold">{workspace.name}</h3>
+              <CardDescription className="text-balance truncate text-sm">
+                {workspace.description}
+              </CardDescription>
+            </div>
+            <DropdownMenuWorkspace />
           </div>
-          <DropdownMenuWorkspace />
-        </div>
-      </CardHeader>
-      <CardContent className="px-1">
-        <div className="flex h-8 items-center gap-4 text-sm p-2">
-          <div>
-            <AvatarGroup>
-              {/* Chỉ lấy tối đa 3 thành viên đầu tiên */}
-              {workspace.members.slice(0, 2).map((mb) => (
-                <Avatar title={mb.user.name} key={mb.user._id}>
-                  <AvatarImage
-                    src={mb.user.profilePicture}
-                    alt={mb.user.name}
-                  />
-                  <AvatarFallback>
-                    {mb.user.name?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
+        </CardHeader>
+        <CardContent className="px-1 pb-2">
+          <div className="flex justify-between h-full">
+            {/* Group Avatar các thành viên */}
+            <div className="flex items-center">
+              <AvatarGroup>
+                {workspace.members.slice(0, 2).map((mb) => (
+                  <Avatar
+                    title={mb.user.name}
+                    key={mb.user._id}
+                    className="h-7 w-7"
+                  >
+                    <AvatarImage
+                      src={mb.user.profilePicture}
+                      alt={mb.user.name}
+                    />
+                    <AvatarFallback>
+                      {mb.user.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+                {workspace.members.length > 2 && (
+                  <AvatarGroupCount>
+                    +{workspace.members.length - 2}
+                  </AvatarGroupCount>
+                )}
+              </AvatarGroup>
+            </div>
 
-              {/* Hiển thị số lượng còn lại nếu tổng số thành viên > 3 */}
-              {workspace.members.length > 2 && (
-                <AvatarGroupCount>
-                  +{workspace.members.length - 3}
-                </AvatarGroupCount>
-              )}
-            </AvatarGroup>
+            <Separator orientation="vertical" className="h-6" />
+
+            {/* Group Owner */}
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-[10px] uppercase font-medium">
+                Owner:
+              </span>
+              <Avatar title={ownerUser?.name} className="h-6 w-6">
+                <AvatarImage src={ownerUser?.profilePicture} />
+                <AvatarFallback className="bg-primary text-[10px] text-white">
+                  {ownerUser?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+
+            <Separator orientation="vertical" className="h-6" />
+
+            {/* Phần hiển thị Tiến độ: Text + Chart */}
+            {/* TODO: Array map */}
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-medium whitespace-nowrap">
+                12 Task - 9 Done
+              </span>
+              <div className="h-12">
+                <WorkspaceChartPieDonutActive />
+              </div>
+            </div>
           </div>
-          <Separator orientation="vertical" />
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-muted-foreground text-xs">Owner:</span>
-            <Avatar title={ownerUser?.name} className="h-6 w-6">
-              <AvatarImage
-                src={ownerUser?.profilePicture}
-                alt={ownerUser?.name}
-              />
-              <AvatarFallback className="bg-primary text-[10px] text-white">
-                {ownerUser?.name?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-          <Separator orientation="vertical" />
-          <span className="text-xs"> 12 Task - 9 Done</span>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 
