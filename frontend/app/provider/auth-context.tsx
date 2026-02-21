@@ -23,6 +23,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { pathname } = useLocation();
   const isPublicRoute = publicRoutes.includes(pathname);
 
+  useEffect(() => {
+    const handleForceLogout = () => {
+      console.warn("Phiên đăng nhập hết hạn!");
+      logout(); // Gọi hàm logout xịn cậu đã viết bên dưới
+    };
+
+    // Lắng nghe sự kiện từ file fetch-utils.ts
+    window.addEventListener("force-logout", handleForceLogout);
+
+    return () => {
+      window.removeEventListener("force-logout", handleForceLogout);
+    };
+  }, []);
+
   // Kiểm tra auth khi lần đầu load app
   useEffect(() => {
     const checkAuth = () => {

@@ -67,11 +67,11 @@ const UserMenu = ({ user }: UserMenuProps) => {
   };
 
   // 3. Cấu hình màu sắc Badge
-  const statusColors: Record<string, string> = {
-    online: "bg-green-500",
-    away: "bg-yellow-500",
-    busy: "bg-red-500",
-    offline: "bg-gray-400",
+  const statusConfig: Record<string, { color: string; dot: string }> = {
+    online: { color: "text-green-500", dot: "bg-green-500" },
+    away: { color: "text-yellow-500", dot: "bg-yellow-500" },
+    busy: { color: "text-red-500", dot: "bg-red-500" },
+    offline: { color: "text-gray-400", dot: "bg-gray-400" },
   };
 
   return (
@@ -92,7 +92,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
             {/* Dynamic Status Badge */}
             <span
               className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-background 
-  ${statusColors[currentStatus]} 
+  ${statusConfig[currentStatus]?.dot || "bg-gray-400"} 
   ${currentStatus === "online" ? "animate-pulse" : ""}`}
             />
           </div>
@@ -119,26 +119,28 @@ const UserMenu = ({ user }: UserMenuProps) => {
         <DropdownMenuSeparator />
 
         {/* Mục đổi trạng thái thủ công */}
-        <div className="px-2 py-1.5">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1 px-2">
-            Trạng thái
-          </p>
-          <div className="flex gap-1">
-            {["online", "busy", "away"].map((st) => (
-              <Button
-                key={st}
-                variant="ghost"
-                size="sm"
-                className={`h-7 px-2 text-xs ${currentStatus === st ? "bg-secondary" : ""}`}
-                onClick={() => updateStatus(st)}
-              >
-                <Circle
-                  className={`mr-1 h-2 w-2 fill-current ${statusColors[st]}`}
-                />
-                {t(st)}
-              </Button>
-            ))}
-          </div>
+        <div className="flex flex-col gap-1 px-1">
+          {["online", "busy", "away"].map((st) => (
+            <Button
+              key={st}
+              variant="ghost"
+              size="sm"
+              className={`w-full justify-start h-8 px-2 text-xs font-medium hover:bg-accent ${
+                currentStatus === st ? "bg-accent/50" : ""
+              }`}
+              onClick={() => updateStatus(st)}
+            >
+              {/* Thay Circle bằng div để có chấm màu đặc (solid dot) */}
+              <div
+                className={`mr-2 h-2.5 w-2.5 rounded-full ${statusConfig[st].dot}`}
+              />
+              <span className="capitalize">{t(st)}</span>
+
+              {currentStatus === st && (
+                <div className="ml-auto h-1 w-1 rounded-full bg-primary" />
+              )}
+            </Button>
+          ))}
         </div>
 
         <DropdownMenuSeparator />

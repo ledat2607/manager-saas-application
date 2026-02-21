@@ -1,3 +1,5 @@
+import CreateProjectDialog from "@/components/dashboard_component/project/create-project";
+import ProjectList from "@/components/dashboard_component/workspace/project-list";
 import WorkspaceHeader from "@/components/dashboard_component/workspace/workspace-header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,15 +13,15 @@ const WorkspaceDetail = () => {
   const { workspacesId } = useParams<{ workspacesId: string }>();
   const [isCreateProject, setIsCreateProject] = useState(false);
   const [inviteMember, setIsInviteMember] = useState(false);
-
-  if (!workspacesId) {
+  const workspaceId = workspacesId;
+  if (!workspaceId) {
     return (
       <div className="min-h-screen flex items-center justify-center flex-col">
         Not found workspace
       </div>
     );
   }
-  const { data: workspace, isLoading } = useGetWorkspaceQuery(workspacesId) as {
+  const { data: workspace, isLoading } = useGetWorkspaceQuery(workspaceId) as {
     data: {
       workspace: Workspace;
       projects: Project[];
@@ -38,6 +40,18 @@ const WorkspaceDetail = () => {
         member={workspace?.workspace?.members as any}
         onCreateProject={() => setIsCreateProject(!isCreateProject)}
         onInviteMember={() => setIsInviteMember(!inviteMember)}
+      />
+      <ProjectList
+        workspaceId={workspace.workspace._id}
+        projects={workspace.projects}
+        onCreateProject={() => setIsCreateProject(!isCreateProject)}
+      />
+
+      <CreateProjectDialog
+        isOpen={isCreateProject}
+        onOpenChange={() => setIsCreateProject(!isCreateProject)}
+        workspaceId={workspaceId}
+        workspaceMembers={workspace.workspace.members as any}
       />
     </div>
   );

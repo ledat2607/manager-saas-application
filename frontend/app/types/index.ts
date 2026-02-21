@@ -93,3 +93,9 @@ export interface Attachment {
   uploadedAt: Date;
   _id: string;
 }
+export interface Member {
+  _id: string; // Đây là ID của bản ghi Member trong Workspace
+  role: "admin" | "member" | "owner" | "viewer";
+  joinedAt: Date;
+  user: User;
+}

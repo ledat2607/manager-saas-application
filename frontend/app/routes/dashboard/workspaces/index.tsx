@@ -91,7 +91,7 @@ const WorkspaceSkeleton = () => {
   return (
     <div className="grid lg:grid-cols-4 gap-4 w-full grid-cols-1">
       <Card className="w-full max-w-xs">
-        <CardHeader>
+        <CardHeader className="p-2">
           <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-4 w-1/2" />
         </CardHeader>
