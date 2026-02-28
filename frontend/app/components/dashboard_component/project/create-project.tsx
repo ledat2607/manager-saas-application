@@ -35,8 +35,10 @@ import { ProjectSchema } from "@/lib/schema";
 import { ProjectStatus, type Member } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { useCreateProject } from "hook/use-project";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 interface CreateProjectDialogProps {
@@ -54,6 +56,8 @@ const CreateProjectDialog = ({
   workspaceId,
   workspaceMembers,
 }: CreateProjectDialogProps) => {
+  const { mutate: createProject, isPending } = useCreateProject();
+
   const form = useForm<CreateProjectShemaDialogProps>({
     resolver: zodResolver(ProjectSchema),
     defaultValues: {
@@ -67,9 +71,25 @@ const CreateProjectDialog = ({
     },
   });
   const handleSubmit = (data: CreateProjectShemaDialogProps) => {
-    console.log(data);
+    if (!workspaceId) return;
+    console.log(data, workspaceId)
+    createProject(
+      {
+        projectData: data,
+        workspaceId,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Project created successfully");
+          form.reset();
+          onOpenChange(false);
+        },
+        onError: (error: any) => {
+          toast.error(error?.message || "Failed to create project");
+        },
+      },
+    );
   };
-  console.log(workspaceMembers);
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-135">

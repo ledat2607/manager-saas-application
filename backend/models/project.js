@@ -30,8 +30,8 @@ const projectSchema = new Schema(
         },
         role: {
           type: String,
-          enum: ["manager", "contributor", "viewer"],
-          default: "contributor",
+          enum: ["manager", "owner", "viewer"],
+          default: "owner",
         },
       },
     ],

@@ -15,6 +15,7 @@ import UserMenu from "../home_component/user-menu";
 import WorkspaceAvatar from "./workspace/workspace-avatar";
 import type { User, Workspace } from "@/types";
 import { useLoaderData, useNavigate, useParams } from "react-router";
+import { ModeToggle } from "../home_component/mode-toggle";
 
 interface HeaderDashboardProps {
   user: User | null;
@@ -26,7 +27,6 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
   const navigate = useNavigate();
   const params = useParams();
 
-  
   const selectedId = params.workspacesId || params.id;
   const selectedWorkspace = useMemo(() => {
     return workspaces?.find((ws) => ws._id === selectedId);
@@ -35,7 +35,6 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
   const handleSelect = (ws: Workspace) => {
     navigate(`/workspaces/${ws._id}`);
   };
-
 
   return (
     <div className="sticky top-0 bg-background/80 backdrop-blur-md z-40 border-b justify-between flex items-center p-3.5">
@@ -137,6 +136,7 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
             <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background"></span>
           </Button>
           <UserMenu user={user} />
+          <ModeToggle />
         </div>
       </div>
     </div>

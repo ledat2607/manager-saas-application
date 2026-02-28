@@ -14,7 +14,6 @@ import {
   verifyEmail,
   verifyTokenAndResetPassword,
 } from "../controllers/auth-controller.js";
-import z from "zod";
 
 const router = express.Router();
 

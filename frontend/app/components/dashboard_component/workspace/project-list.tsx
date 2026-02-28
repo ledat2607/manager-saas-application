@@ -18,7 +18,7 @@ const ProjectList = ({
   return (
     <div>
       <h3 className="text-2xl font-medium text-balance">Projects</h3>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {projects.length === 0 ? (
           <NoDataFound
             title="No project found"
