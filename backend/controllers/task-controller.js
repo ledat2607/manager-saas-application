@@ -2,7 +2,6 @@ import Project from "../models/project.js";
 import Task from "../models/task.js";
 import Workspace from "../models/workspace.js";
 
-
 const createTask = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -26,7 +25,7 @@ const createTask = async (req, res) => {
     }
 
     const isMember = workspace.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
+      (member) => member.user.toString() === req.user._id.toString(),
     );
 
     if (!isMember) {
@@ -58,4 +57,29 @@ const createTask = async (req, res) => {
   }
 };
 
-export { createTask };
+const getTaskById = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const task = await Task.findById(taskId)
+      .populate("assignees", "name email profilePicture")
+      .populate("watchers", "name email profilePicture");
+
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+    const project = await Project.findById(task.project).populate(
+      "members.user",
+      "name profilePicture",
+    );
+
+    res.status(200).json({ task, project });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+export { createTask, getTaskById };
