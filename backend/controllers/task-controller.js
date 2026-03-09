@@ -1,3 +1,4 @@
+import { recordActivity } from "../libs/index.js";
 import Project from "../models/project.js";
 import Task from "../models/task.js";
 import Workspace from "../models/workspace.js";
@@ -82,4 +83,99 @@ const getTaskById = async (req, res) => {
     });
   }
 };
-export { createTask, getTaskById };
+
+const updateTaskTitle = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { title } = req.body;
+
+    //1. Validate taskID
+    if (!taskId) {
+      return res.status(400).json({ message: "Invalid taskID" });
+    }
+
+    //2 Find task
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(400).json({ message: "Task not found" });
+    }
+
+    //3. find project
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(400).json({ message: "Project not found" });
+    }
+
+    //4. Check member
+    const isMember = project.members.some(
+      (member) => member.user.toString() === req.user._id.toString(),
+    );
+    if (!isMember) {
+      return res.status(400).json({ message: "You not available for action" });
+    }
+    const oldTitle = task.title;
+    task.title = title;
+    await task.save();
+
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+      details: `update task title from ${oldTitle} to ${title}`,
+    });
+    res.status(200).json(task);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const updateTaskDescription = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { description } = req.body;
+
+    //1. Validate taskID
+    if (!taskId) {
+      return res.status(400).json({ message: "Invalid taskID" });
+    }
+
+    //2 Find task
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(400).json({ message: "Task not found" });
+    }
+
+    //3. find project
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(400).json({ message: "Project not found" });
+    }
+
+    //4. Check member
+    const isMember = project.members.some(
+      (member) => member.user.toString() === req.user._id.toString(),
+    );
+    if (!isMember) {
+      return res.status(400).json({ message: "You not available for action" });
+    }
+    const oldDes =
+      task.description.substring(0, 50) +
+      (task.description.length > 50 ? "..." : "");
+    task.description = description;
+    await task.save();
+
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+      details: `update task description from ${oldDes} to ${description}`,
+    });
+    res.status(200).json(task);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export { createTask, getTaskById, updateTaskTitle, updateTaskDescription };

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { userAuth } from "@/provider/auth-context";
 import type { Project, Task, Workspace } from "@/types";
+import { formatDistanceToNow } from "date-fns";
 import { useGetTaskQuery } from "hook/use-task";
 import { ArrowLeft, Eye, EyeOff, Loader } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
@@ -97,6 +98,12 @@ const TaskDetail = () => {
                   {task.priority} priority
                 </Badge>
                 <TaskTitle title={task.title} taskId={task._id} />
+                <div className="text-sm truncate font-semibold text-muted-foreground">
+                  Created At:{" "}
+                  {formatDistanceToNow(new Date(task.createdAt), {
+                    addSuffix: true,
+                  })}
+                </div>
               </div>
             </div>
           </div>
