@@ -113,14 +113,14 @@ const TaskTitle = ({ taskId, title }: TaskTitleProps) => {
               onClick={() => setIsEditing(true)}
               className={cn(
                 "text-2xl font-extrabold tracking-tight cursor-pointer inline-block",
-                "bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400",
+                "bg-clip-text text-transparent bg-linear-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-400",
                 "hover:from-indigo-600 hover:to-violet-500 transition-all duration-300",
               )}
             >
               {title}
             </h2>
             {/* Thanh gạch chân trang trí cực mảnh */}
-            <div className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-transparent group-hover:w-24 transition-all duration-500" />
+            <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-indigo-500 to-transparent group-hover:w-24 transition-all duration-500" />
           </div>
 
           <Button

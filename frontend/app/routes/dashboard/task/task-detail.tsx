@@ -1,12 +1,20 @@
 import { BackButton } from "@/components/dashboard_component/back-button";
+import SubtaskDetails from "@/components/dashboard_component/tasks/sub-task";
+import TaskActivity from "@/components/dashboard_component/tasks/task-activity";
+import TaskAssigneeSelector from "@/components/dashboard_component/tasks/task-assignee-selector";
+import TaskDescription from "@/components/dashboard_component/tasks/task-desctiption";
+import TaskPrioritySelector from "@/components/dashboard_component/tasks/task-priority";
+import TaskStatusSelector from "@/components/dashboard_component/tasks/task-status-selector";
 import TaskTitle from "@/components/dashboard_component/tasks/task-tittle";
+import Watchers from "@/components/dashboard_component/tasks/watchers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { userAuth } from "@/provider/auth-context";
-import type { Project, Task, Workspace } from "@/types";
+import type { Project, Subtask, Task, Workspace } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 import { useGetTaskQuery } from "hook/use-task";
-import { ArrowLeft, Eye, EyeOff, Loader } from "lucide-react";
+import { AlignLeft, ArrowLeft, Eye, EyeOff, Loader, Trash } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 
 const TaskDetail = () => {
@@ -45,7 +53,8 @@ const TaskDetail = () => {
 
   return (
     <div className="container mx-auto p-0 py-4 md:px-4">
-      <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+      {/*Header */}
+      <div className="flex flex-col md:flex-row md:justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <Button variant={"outline"} onClick={goBack}>
             <ArrowLeft /> Back
@@ -55,7 +64,6 @@ const TaskDetail = () => {
             <Badge className="mr-4 w-fit px-0 md:px-4">Archived</Badge>
           )}
         </div>
-
         <div className="flex space-x-2 mt-4 md:mt-0">
           <Button
             variant={"outline"}
@@ -80,9 +88,12 @@ const TaskDetail = () => {
           </Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="lg:col-span-2">
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/*Left side */}
+        <div className="lg:col-span-2 space-y-6">
           <div className="bg-card rounded p-6 shadow-sm mb-6">
+            {/*Header */}
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div>
                 <Badge
@@ -105,8 +116,55 @@ const TaskDetail = () => {
                   })}
                 </div>
               </div>
+              <div className="flex items-center gap-2 mt-4 md:mt-0">
+                <TaskStatusSelector status={task.status} taskId={task._id} />
+                <Button
+                  variant={"destructive"}
+                  className="hidden lg:flex"
+                  onClick={() => {}}
+                  size={"sm"}
+                >
+                  <Trash className="mr-2 size-4" />
+                  Delete
+                </Button>
+              </div>
             </div>
+
+            <Separator className="bg-blue-500" />
+
+            {/*Description */}
+            <div className="mt-6">
+              {/* Label nhỏ phía trên */}
+              <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+                <AlignLeft className="h-4 w-4" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  Description
+                </span>
+              </div>
+
+              <TaskDescription
+                taskId={task._id}
+                description={task?.description}
+              />
+            </div>
+
+            <TaskAssigneeSelector
+              task={task}
+              assignees={task.assignees}
+              projectMembers={project.members as any}
+            />
+
+            <TaskPrioritySelector taskId={task._id} priority={task.priority} />
+
+            <SubtaskDetails subTasks={task.subtasks || []} taskId={task._id} />
           </div>
+        </div>
+
+        {/*Right side */}
+        <div className="lg:col-span-1 space-y-6">
+          <Watchers watchers={task?.watchers || []} />
+
+          <TaskActivity resourceId={task._id} />
         </div>
       </div>
     </div>
