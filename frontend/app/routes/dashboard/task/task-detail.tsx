@@ -1,4 +1,5 @@
 import { BackButton } from "@/components/dashboard_component/back-button";
+import CommentSection from "@/components/dashboard_component/tasks/comment-section";
 import SubtaskDetails from "@/components/dashboard_component/tasks/sub-task";
 import TaskActivity from "@/components/dashboard_component/tasks/task-activity";
 import TaskAssigneeSelector from "@/components/dashboard_component/tasks/task-assignee-selector";
@@ -13,9 +14,14 @@ import { Separator } from "@/components/ui/separator";
 import { userAuth } from "@/provider/auth-context";
 import type { Project, Subtask, Task, Workspace } from "@/types";
 import { formatDistanceToNow } from "date-fns";
-import { useGetTaskQuery } from "hook/use-task";
+import {
+  useArchievedTask,
+  useGetTaskQuery,
+  useWatchStatusTask,
+} from "hook/use-task";
 import { AlignLeft, ArrowLeft, Eye, EyeOff, Loader, Trash } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const TaskDetail = () => {
   const { user } = userAuth();
@@ -26,6 +32,36 @@ const TaskDetail = () => {
   }>();
 
   const navigate = useNavigate();
+
+  const { mutate: watchTask, isPending: pendingWatch } = useWatchStatusTask();
+  const { mutate, isPending } = useArchievedTask();
+
+  const handleWatch = () => {
+    watchTask(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Changed successfull");
+        },
+        onError: () => {
+          toast.error("Failed");
+        },
+      },
+    );
+  };
+  const handleArchieved = () => {
+    mutate(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Changed successfull");
+        },
+        onError: () => {
+          toast.error("Failed");
+        },
+      },
+    );
+  };
   const { data, isLoading } = useGetTaskQuery(taskId!) as {
     data: {
       task: Task;
@@ -67,9 +103,10 @@ const TaskDetail = () => {
         <div className="flex space-x-2 mt-4 md:mt-0">
           <Button
             variant={"outline"}
-            onClick={() => {}}
+            onClick={handleWatch}
             className="w-fit"
             size={"sm"}
+            disabled={pendingWatch}
           >
             {isUserWatching ? (
               <>
@@ -83,7 +120,12 @@ const TaskDetail = () => {
               </>
             )}
           </Button>
-          <Button variant={"outline"} size={"sm"} onClick={() => {}}>
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            onClick={handleArchieved}
+            disabled={isPending}
+          >
             {task.isArchived ? "Un archived" : "Archived"}
           </Button>
         </div>
@@ -158,6 +200,7 @@ const TaskDetail = () => {
 
             <SubtaskDetails subTasks={task.subtasks || []} taskId={task._id} />
           </div>
+          <CommentSection taskId={task._id} member={project.members as any} />
         </div>
 
         {/*Right side */}

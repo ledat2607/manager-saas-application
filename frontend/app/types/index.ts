@@ -133,3 +133,55 @@ export interface ActivityLog {
   details: any;
   createdAt: Date;
 }
+
+export interface CommentReaction {
+  emoji: string;
+  user: User;
+}
+
+export interface Comment {
+  _id: string;
+  author: User;
+  text: string;
+  createdAt: Date;
+  reactions?: CommentReaction[];
+  attachments?: {
+    fileName: string;
+    fileUrl: string;
+    fileType?: string;
+    fileSize?: number;
+  }[];
+}
+export interface StatsCardProps {
+  totalProjects: number;
+  totalTasks: number;
+  totalProjectInProgress: number;
+  totalTaskComplete: number;
+  totalTaskToDo: number;
+  totalTaskInProgress: number;
+}
+
+export interface TaskTrendsData {
+  name: string;
+  completed: number;
+  inProgress: number;
+  todo: number;
+}
+
+export interface TaskPriorityData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export interface ProjectStatusData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export interface WorkspaceProductivityData {
+  name: string;
+  completed: number;
+  total: number;
+}

@@ -173,9 +173,7 @@ const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
             {/* Phần hiển thị Tiến độ: Text + Chart */}
             {/* TODO: Array map */}
             <div className="flex items-center gap-1">
-              <span className="text-xs font-medium whitespace-nowrap">
-                12 Task - 9 Done
-              </span>
+              <span className="text-xs font-medium whitespace-nowrap">  </span>
               <div className="h-12">
                 <WorkspaceChartPieDonutActive />
               </div>

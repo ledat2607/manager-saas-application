@@ -1,6 +1,6 @@
 import { userAuth } from "@/provider/auth-context";
-import React, { useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router";
+import React, { useEffect, useMemo, useState } from "react";
+import { Navigate, Outlet, useLoaderData, useSearchParams } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeaderDashboard from "@/components/dashboard_component/header";
 
@@ -8,6 +8,7 @@ import Sidebar from "@/components/dashboard_component/sidebar";
 import { Separator } from "@/components/ui/separator";
 import CreateWorkspace from "@/components/dashboard_component/workspace/create-workspace";
 import { getData } from "@/lib/fetch-utils";
+import type { Workspace } from "@/types";
 
 export const clientLoader = async () => {
   try {
@@ -31,7 +32,14 @@ const DashboardLayout = () => {
     isLoading: isAuthLoading,
   } = userAuth();
   const [isMinimumTimePassed, setIsMinimumTimePassed] = useState(false);
-
+  const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
+  const [searchParams] = useSearchParams();
+  const workspaceIdFromUrl = searchParams.get("workspaceId");
+  const currentWorkspace = useMemo(() => {
+    if (!workspaces) return null;
+    // Nếu có ID trên URL, tìm cái đó. Nếu không, mặc định lấy cái đầu tiên
+    return workspaces.find((ws) => ws._id === workspaceIdFromUrl);
+  }, [workspaces, workspaceIdFromUrl]);
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMinimumTimePassed(true);
@@ -69,6 +77,8 @@ const DashboardLayout = () => {
         <HeaderDashboard
           onCreateWorkspace={() => setIsCreatingWorkspace(true)}
           user={user}
+          onWorkspaceSelected={() => {}}
+          selectedWorkspace={currentWorkspace || null}
         />
 
         <main className="flex-1 overflow-y-auto h-full w-full">

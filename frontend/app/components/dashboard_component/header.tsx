@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Bell, PlusCircle, Search, Check, PenLine } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -14,28 +14,67 @@ import {
 import UserMenu from "../home_component/user-menu";
 import WorkspaceAvatar from "./workspace/workspace-avatar";
 import type { User, Workspace } from "@/types";
-import { useLoaderData, useNavigate, useParams } from "react-router";
+import {
+  useLoaderData,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router";
 import { ModeToggle } from "../home_component/mode-toggle";
 
 interface HeaderDashboardProps {
   user: User | null;
   onCreateWorkspace: () => void;
+  onWorkspaceSelected: (workspace: Workspace) => void;
+  selectedWorkspace: Workspace | null;
 }
 
-const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
+const HeaderDashboard = ({
+  onCreateWorkspace,
+  user,
+  onWorkspaceSelected,
+  selectedWorkspace,
+}: HeaderDashboardProps) => {
   const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const params = useParams();
 
-  const selectedId = params.workspacesId || params.id;
-  const selectedWorkspace = useMemo(() => {
-    return workspaces?.find((ws) => ws._id === selectedId);
-  }, [selectedId, workspaces]);
+  // 1. Tự động phục hồi hoặc set ID mặc định
+  useEffect(() => {
+    // Chỉ xử lý khi ở trang Dashboard (không có /workspaces/ trong path)
+    const isDashboardPath =
+      location.pathname === "/dashboard" || location.pathname === "/";
 
-  const handleSelect = (ws: Workspace) => {
-    navigate(`/workspaces/${ws._id}`);
+    if (isDashboardPath && workspaces?.length > 0) {
+      const lastId = localStorage.getItem("lastWorkspaceId");
+      const currentIdInUrl = searchParams.get("workspaceId");
+
+      if (!currentIdInUrl) {
+        const idToSet =
+          lastId && workspaces.some((ws) => ws._id === lastId)
+            ? lastId
+            : workspaces[0]._id;
+
+        setSearchParams({ workspaceId: idToSet }, { replace: true });
+      } else {
+        // Nếu URL có ID, cập nhật lại localStorage để đồng bộ
+        localStorage.setItem("lastWorkspaceId", currentIdInUrl);
+      }
+    }
+  }, [location.pathname, workspaces, searchParams, setSearchParams]);
+
+  const handleSelect = (workspace: Workspace) => {
+    onWorkspaceSelected(workspace);
+    localStorage.setItem("lastWorkspaceId", workspace._id); // Lưu lại ngay khi chọn
+
+    if (location.pathname.includes("/workspaces/")) {
+      navigate(`/workspaces/${workspace._id}`);
+    } else {
+      setSearchParams({ workspaceId: workspace._id });
+    }
   };
-
   return (
     <div className="sticky top-0 bg-background/80 backdrop-blur-md z-40 border-b justify-between flex items-center p-3.5">
       <DropdownMenu>
@@ -78,7 +117,9 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
                     key={ws._id}
                     onClick={() => handleSelect(ws)}
                     className={`flex items-center gap-3 p-2 rounded-md cursor-pointer mb-1 transition-all ${
-                      selectedId === ws._id ? "bg-accent" : "hover:bg-accent/50"
+                      selectedWorkspace?._id === ws._id
+                        ? "bg-accent"
+                        : "hover:bg-accent/50"
                     }`}
                   >
                     <WorkspaceAvatar
@@ -87,11 +128,11 @@ const HeaderDashboard = ({ onCreateWorkspace, user }: HeaderDashboardProps) => {
                       pictureUrl={ws.workspacePicture}
                     />
                     <span
-                      className={`flex-1 font-medium ${selectedId === ws._id ? "text-primary" : ""}`}
+                      className={`flex-1 font-medium ${selectedWorkspace?._id === ws._id ? "text-primary" : ""}`}
                     >
                       {ws.name}
                     </span>
-                    {selectedId === ws._id && (
+                    {selectedWorkspace?._id === ws._id && (
                       <Check className="w-4 h-4 text-primary animate-in zoom-in duration-300" />
                     )}
                   </DropdownMenuItem>
