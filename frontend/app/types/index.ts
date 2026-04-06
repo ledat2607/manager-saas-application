@@ -17,7 +17,7 @@ export interface Workspace {
   workspacePicture: string;
   members: {
     user: User;
-    role: "admin" | "member" | "owner" | "viewer";
+    role: "manager" | "member" | "owner" | "viewer";
     joinedAt: Date;
   }[];
   createdAt: Date;
@@ -44,7 +44,7 @@ export interface Project {
   tasks: Task[];
   members: {
     user: User;
-    role: "admin" | "member" | "owner" | "viewer";
+    role: "manager" | "member" | "owner" | "viewer";
   }[];
   createdAt: Date;
   updatedAt: Date;
@@ -74,6 +74,7 @@ export interface Task {
   createdAt: Date;
   updatedAt: Date;
   isArchived: boolean;
+  startDate: Date;
   dueDate: Date;
   priority: TaskPriority;
   assignee: User | string;
@@ -95,7 +96,7 @@ export interface Attachment {
 }
 export interface Member {
   _id: string; // Đây là ID của bản ghi Member trong Workspace
-  role: "admin" | "member" | "owner" | "viewer";
+  role: "manager" | "member" | "owner" | "viewer";
   joinedAt: Date;
   user: User;
 }
@@ -161,7 +162,7 @@ export interface StatsCardProps {
   totalTaskInProgress: number;
 }
 
-export interface TaskTrendsData {
+export interface TaskTrendData {
   name: string;
   completed: number;
   inProgress: number;
@@ -185,3 +186,11 @@ export interface WorkspaceProductivityData {
   completed: number;
   total: number;
 }
+
+export interface FilterMembers {
+  user: User;
+  role: "manager" | "member" | "owner" | "viewer";
+  joinedAt: Date;
+}
+
+

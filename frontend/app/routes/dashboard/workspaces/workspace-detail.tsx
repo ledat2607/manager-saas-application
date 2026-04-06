@@ -1,4 +1,5 @@
 import CreateProjectDialog from "@/components/dashboard_component/project/create-project";
+import InviteMemberDialog from "@/components/dashboard_component/workspace/invite-member";
 import ProjectList from "@/components/dashboard_component/workspace/project-list";
 import WorkspaceHeader from "@/components/dashboard_component/workspace/workspace-header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -13,6 +14,7 @@ const WorkspaceDetail = () => {
   const { workspacesId } = useParams<{ workspacesId: string }>();
   const [isCreateProject, setIsCreateProject] = useState(false);
   const [inviteMember, setIsInviteMember] = useState(false);
+
   const workspaceId = workspacesId;
   if (!workspaceId) {
     return (
@@ -52,6 +54,12 @@ const WorkspaceDetail = () => {
         onOpenChange={() => setIsCreateProject(!isCreateProject)}
         workspaceId={workspaceId}
         workspaceMembers={workspace.workspace.members as any}
+      />
+
+      <InviteMemberDialog
+        isOpen={inviteMember}
+        onOpenChange={() => setIsInviteMember(!inviteMember)}
+        workspaceId={workspaceId}
       />
     </div>
   );

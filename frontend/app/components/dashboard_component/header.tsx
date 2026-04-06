@@ -45,7 +45,9 @@ const HeaderDashboard = ({
   useEffect(() => {
     // Chỉ xử lý khi ở trang Dashboard (không có /workspaces/ trong path)
     const isDashboardPath =
-      location.pathname === "/dashboard" || location.pathname === "/";
+      location.pathname === "/dashboard" ||
+      location.pathname === "/my-teams" ||
+      location.pathname === "/";
 
     if (isDashboardPath && workspaces?.length > 0) {
       const lastId = localStorage.getItem("lastWorkspaceId");

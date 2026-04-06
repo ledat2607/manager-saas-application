@@ -29,3 +29,20 @@ export const useGetWorkspaceStatQuery = (workspaceId: string) => {
     queryFn: async () => getData(`/workspaces/${workspaceId}/stats`),
   });
 };
+
+export const useGetWorkspaceDetailsQuery = (workspaceId: string) => {
+  return useQuery({
+    queryKey: ["workspace", workspaceId, "details"],
+    queryFn: async () => getData(`/workspaces/${workspaceId}`),
+  });
+};
+
+export const useInviteMemberToWorkspace = () => {
+  return useMutation({
+    mutationFn: async (data: {
+      workspaceId: string;
+      email: string;
+      role: string;
+    }) => postData(`/workspaces/${data.workspaceId}/invite-member`, data),
+  });
+};

@@ -1,6 +1,6 @@
 import type { CreateTaskFormData } from "@/components/dashboard_component/tasks/create-task-dialog";
 import { getData, postData, putData } from "@/lib/fetch-utils";
-import type { Subtask, TaskPriority, TaskStatus } from "@/types";
+import type { TaskPriority, TaskStatus } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTaskMutation = () => {
@@ -198,5 +198,12 @@ export const useArchievedTask = () => {
         queryKey: ["task-activity", data.task],
       });
     },
+  });
+};
+
+export const useGetMyTaskQuery = () => {
+  return useQuery({
+    queryKey: ["my-tasks", "user"],
+    queryFn: () => getData("/tasks/my-tasks"),
   });
 };

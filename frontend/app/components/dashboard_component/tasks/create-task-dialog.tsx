@@ -63,6 +63,7 @@ export const CreateTaskDialog = ({
       status: "To Do",
       priority: "Medium",
       dueDate: "",
+      startDate: "",
       assignees: [],
     },
   });
@@ -115,7 +116,7 @@ export const CreateTaskDialog = ({
                   control={form.control}
                   name="description"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="mt-4">
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea
@@ -128,7 +129,7 @@ export const CreateTaskDialog = ({
                   )}
                 />
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
                   <FormField
                     control={form.control}
                     name="status"
@@ -194,51 +195,101 @@ export const CreateTaskDialog = ({
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date</FormLabel>
-                      <FormControl>
-                        <Popover modal={true}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={
-                                "w-full justify-start text-left font-normal" +
-                                (!field.value ? "text-muted-foreground" : "")
-                              }
-                            >
-                              <CalendarIcon className="size-4 mr-2" />
-                              {field.value ? (
-                                format(new Date(field.value), "PPPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Start Date</FormLabel>
+                        <FormControl>
+                          <Popover modal={true}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className={
+                                  "w-full justify-start text-left font-normal" +
+                                  (!field.value ? "text-muted-foreground" : "")
+                                }
+                              >
+                                <CalendarIcon className="size-4 mr-2" />
+                                {field.value ? (
+                                  format(new Date(field.value), "PPPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
 
-                          <PopoverContent>
-                            <Calendar
-                              mode="single"
-                              selected={
-                                field.value ? new Date(field.value) : undefined
-                              }
-                              onSelect={(date) => {
-                                field.onChange(
-                                  date?.toISOString() || undefined,
-                                );
-                              }}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                            <PopoverContent>
+                              <Calendar
+                                mode="single"
+                                selected={
+                                  field.value
+                                    ? new Date(field.value)
+                                    : undefined
+                                }
+                                onSelect={(date) => {
+                                  field.onChange(
+                                    date?.toISOString() || undefined,
+                                  );
+                                }}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Due Date</FormLabel>
+                        <FormControl>
+                          <Popover modal={true}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className={
+                                  "w-full justify-start text-left font-normal" +
+                                  (!field.value ? "text-muted-foreground" : "")
+                                }
+                              >
+                                <CalendarIcon className="size-4 mr-2" />
+                                {field.value ? (
+                                  format(new Date(field.value), "PPPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+
+                            <PopoverContent>
+                              <Calendar
+                                mode="single"
+                                selected={
+                                  field.value
+                                    ? new Date(field.value)
+                                    : undefined
+                                }
+                                onSelect={(date) => {
+                                  field.onChange(
+                                    date?.toISOString() || undefined,
+                                  );
+                                }}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name="assignees"
@@ -246,7 +297,7 @@ export const CreateTaskDialog = ({
                     const selectedMembers = field.value || [];
 
                     return (
-                      <FormItem>
+                      <FormItem className="mt-4">
                         <FormLabel>Assignees</FormLabel>
                         <FormControl>
                           <Popover>

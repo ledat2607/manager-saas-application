@@ -21,6 +21,7 @@ const taskSchema = new Schema(
     },
     assignees: [{ type: Schema.Types.ObjectId, ref: "User" }],
     watchers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    startDate: { type: Date },
     dueDate: { type: Date },
     completedAt: { type: Date },
     estimatedHours: { type: Number, min: 0 },

@@ -27,7 +27,7 @@ const recoveryEmailSchema = z.object({
 
 const inviteMemberSchema = z.object({
   email: z.string().email("Invalid email address"),
-  role: z.enum(["admin", "member", "viewer"]),
+  role: z.enum(["manager", "member", "viewer"]),
 });
 
 const tokenSchema = z.object({

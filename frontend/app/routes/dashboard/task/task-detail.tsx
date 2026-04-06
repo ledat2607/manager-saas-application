@@ -150,12 +150,19 @@ const TaskDetail = () => {
                 >
                   {task.priority} priority
                 </Badge>
+
                 <TaskTitle title={task.title} taskId={task._id} />
-                <div className="text-sm truncate font-semibold text-muted-foreground">
-                  Created At:{" "}
-                  {formatDistanceToNow(new Date(task.createdAt), {
-                    addSuffix: true,
-                  })}
+
+                <div className="flex items-center gap-2 justify-between">
+                  <i className="text-muted-foreground font-bold text-sm">
+                    Due Date:{formatDistanceToNow(task.dueDate)}
+                  </i>
+                  <i className="text-sm truncate font-semibold text-muted-foreground items-end">
+                    Created At:{" "}
+                    {formatDistanceToNow(new Date(task.createdAt), {
+                      addSuffix: true,
+                    })}
+                  </i>
                 </div>
               </div>
               <div className="flex items-center gap-2 mt-4 md:mt-0">

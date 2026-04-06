@@ -39,7 +39,7 @@ const MenuDashboardItem = ({
             className={cn(
               "absolute inset-0 z-0 rounded-xl shadow-lg",
               // Gradient cho Light Mode: Sáng hơn một chút
-              "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 shadow-blue-500/30",
+              "bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 shadow-blue-500/30",
               // Gradient cho Dark Mode: Giữ nguyên hoặc đậm hơn tùy ý
               "dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 dark:shadow-blue-900/40",
             )}

@@ -25,6 +25,8 @@ export default [
       "workspaces/:workspacesId/projects/:projectId/tasks/:taskId",
       "routes/dashboard/task/task-detail.tsx",
     ),
+    route("my-tasks", "routes/dashboard/my-tasks.tsx"),
+    route("my-teams", "routes/dashboard/my-teams.tsx"),
   ]),
 
   // ===== AUTH LAYOUT =====

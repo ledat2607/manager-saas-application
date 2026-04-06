@@ -33,7 +33,6 @@ const SignUpForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -56,7 +55,7 @@ const SignUpForm = () => {
     mutate(values, {
       onSuccess: () => {
         toast.success(
-          "Account created successfully! Please check your email to verify your account."
+          "Account created successfully! Please check your email to verify your account.",
         );
         form.reset();
         navigate("/sign-in");

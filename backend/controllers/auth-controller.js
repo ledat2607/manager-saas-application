@@ -10,6 +10,7 @@ import {
 
 //register funcion
 const registerUser = async (req, res) => {
+  
   const session = await mongoose.startSession();
   session.startTransaction();
 

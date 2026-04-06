@@ -11,7 +11,7 @@ interface WorkspaceHeaderProps {
   member: {
     _id: string;
     user: User;
-    role: "admin" | "member" | "owner" | "viewer";
+    role: "manager" | "member" | "owner" | "viewer";
     joinedAt: Date;
   }[];
   onCreateProject: () => void;

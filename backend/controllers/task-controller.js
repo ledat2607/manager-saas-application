@@ -9,8 +9,15 @@ import Comment from "../models/comment.js";
 const createTask = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { title, description, status, priority, dueDate, assignees } =
-      req.body;
+    const {
+      title,
+      description,
+      status,
+      priority,
+      dueDate,
+      startDate,
+      assignees,
+    } = req.body;
 
     const project = await Project.findById(projectId);
 
@@ -43,6 +50,7 @@ const createTask = async (req, res) => {
       description,
       status,
       priority,
+      startDate,
       dueDate,
       assignees,
       project: projectId,
@@ -137,6 +145,7 @@ const updateTaskStatus = async (req, res) => {
   try {
     const { taskId } = req.params;
     const { status } = req.body;
+    console.log(taskId, status);
 
     //1. Validate ID
     if (!taskId) {
@@ -573,7 +582,7 @@ const archievedTask = async (req, res) => {
     const isArchived = task.isArchived;
 
     task.isArchived = !isArchived;
-    
+
     await recordActivity(req.user._id, "updated_task", "Task", taskId, {
       details: `Task ${task.title} ${isArchived ? "is archieved" : "un archieved"} `,
     });
@@ -581,6 +590,21 @@ const archievedTask = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getMyTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({ assignees: { $in: [req.user._id] } })
+      .populate("project", "title workspace")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
   }
 };
 
@@ -599,4 +623,5 @@ export {
   addComment,
   watchTask,
   archievedTask,
+  getMyTasks,
 };

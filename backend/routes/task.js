@@ -17,10 +17,13 @@ import {
   updateTaskStatus,
   updateTaskTitle,
   watchTask,
+  getMyTasks,
 } from "../controllers/task-controller.js";
 import { taskSchema } from "../libs/validate-schema.js";
 
 const router = express.Router();
+
+router.get("/my-tasks", authMiddleware, getMyTasks);
 
 router.post(
   "/:projectId/create-task",
@@ -159,4 +162,5 @@ router.post(
   }),
   archievedTask,
 );
+
 export default router;

@@ -5,6 +5,8 @@ import {
   Users,
   Settings,
   Database,
+  List,
+  Group,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "../ui/separator";
@@ -24,7 +26,8 @@ const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
   const menuItems = [
     { icon: LayoutDashboard, text: "Dashboard", path: "/dashboard" },
     { icon: Database, text: "Workspace", path: "/workspaces" },
-    { icon: Users, text: "Teams", path: "/teams" },
+    { icon: List, text: "My Tasks", path: "/my-tasks" },
+    { icon: Users, text: "My Teams", path: "/my-teams" },
     { icon: Settings, text: "Settings", path: "/settings" },
   ];
 
