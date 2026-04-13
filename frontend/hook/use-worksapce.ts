@@ -46,3 +46,19 @@ export const useInviteMemberToWorkspace = () => {
     }) => postData(`/workspaces/${data.workspaceId}/invite-member`, data),
   });
 };
+
+export const useAccecptWorkspaceInvite = () => {
+  return useMutation({
+    mutationFn: (token: string) =>
+      postData(`/workspaces/accept-invite-token`, { token }),
+  });
+};
+
+export const useAccecptWorkspaceInviteLink = () => {
+  return useMutation({
+    mutationFn: (workspaceId: string) =>
+      postData(`/workspaces/${workspaceId}/accept-generate-invite`, {
+        workspaceId,
+      }),
+  });
+};

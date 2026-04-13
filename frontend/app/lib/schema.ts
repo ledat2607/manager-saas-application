@@ -89,3 +89,27 @@ export const inviteMemberSchema = z.object({
   email: z.string().min(1).email("Invalid email address"),
   role: z.enum(["manager", "member", "owner", "viewer"]),
 });
+
+export const profileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  profilePicture: z.string().optional(),
+  skills: z.array(z.string()),
+  language: z.string().min(1, "Language is required"),
+  timezone: z.string().min(1, "Timezone is required"),
+  bio: z.string().optional(),
+  backgroundImage: z.string().optional(),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z
+      .string()
+      .min(8, "New password must be at least 8 characters"),
+    confirmPassword: z
+      .string()
+      .min(8, "Confirm new password must be at least 8 characters"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "New password and confirm new password must match",
+  });

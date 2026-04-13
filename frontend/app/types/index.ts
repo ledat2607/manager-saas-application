@@ -6,6 +6,13 @@ export interface User {
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+  skills: string[];
+  bio?: string;
+  preferences: {
+    language?: string;
+    timezone?: string;
+    backgroundImage?: string;
+  };
 }
 
 export interface Workspace {
@@ -22,6 +29,7 @@ export interface Workspace {
   }[];
   createdAt: Date;
   updatedAt: Date;
+  projects?: Project[];
 }
 
 export enum ProjectStatus {
@@ -193,4 +201,4 @@ export interface FilterMembers {
   joinedAt: Date;
 }
 
-
+export interface Notification {}

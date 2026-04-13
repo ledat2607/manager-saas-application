@@ -27,6 +27,10 @@ export default [
     ),
     route("my-tasks", "routes/dashboard/my-tasks.tsx"),
     route("my-teams", "routes/dashboard/my-teams.tsx"),
+    route(
+      "workspace-invite/:workspaceId",
+      "routes/dashboard/workspace-invite.tsx",
+    ),
   ]),
 
   // ===== AUTH LAYOUT =====
@@ -36,5 +40,9 @@ export default [
     route("forgot-password", "routes/auth/forgot-password.tsx"),
     route("verify-email", "routes/auth/verify-email.tsx"),
     route("reset-password", "routes/auth/reset-password.tsx"),
+  ]),
+
+  layout("routes/user/user-layout.tsx", [
+    route("/profile", "routes/user/profile.tsx"),
   ]),
 ] satisfies RouteConfig;

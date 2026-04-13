@@ -18,6 +18,7 @@ import {
   updateTaskTitle,
   watchTask,
   getMyTasks,
+  deleteTask,
 } from "../controllers/task-controller.js";
 import { taskSchema } from "../libs/validate-schema.js";
 
@@ -161,6 +162,13 @@ router.post(
     params: z.object({ taskId: z.string() }),
   }),
   archievedTask,
+);
+
+router.delete(
+  "/:taskId/remove",
+  authMiddleware,
+  validateRequest({ params: z.object({ taskId: z.string() }) }),
+  deleteTask,
 );
 
 export default router;

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 interface TaskTitleProps {
   title: string;
   taskId: string;
+  
 }
 
 const TaskTitle = ({ taskId, title }: TaskTitleProps) => {

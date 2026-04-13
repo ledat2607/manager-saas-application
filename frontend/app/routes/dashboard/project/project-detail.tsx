@@ -39,13 +39,14 @@ const ProjectDetail = () => {
   const { data: projectData, isLoading: projectLoading } = useGetProjectById(
     projectId!,
   );
-  if (projectLoading || isLoading) {
+  if (projectLoading || isLoading || !data) {
     return (
       <div className="flex items-center min-h-screen justify-center">
         <Loader className="animate-spin" />
       </div>
     );
   }
+  
   const { project, tasks } = data;
   const progressTask = useProjectProgress(tasks || []);
 
@@ -88,7 +89,6 @@ const ProjectDetail = () => {
       {/* Task Filter Tabs */}
       <div className="flex items-center justify-between">
         <Tabs defaultValue="all" className="w-full">
-          
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <TabsList>
               <TabsTrigger value="all" onClick={() => setTaskFilter("ALL")}>
@@ -138,7 +138,6 @@ const ProjectDetail = () => {
               </div>
             </div>
           </div>
-
           <TabsContent value="all" className="m-0">
             <div className="grid lg:grid-cols-3 gap-4">
               <TaskColumn
@@ -160,8 +159,6 @@ const ProjectDetail = () => {
               />
             </div>
           </TabsContent>
-
-
           <TabsContent value="todo" className="m-0">
             <div className="grid md:grid-cols-2 gap-4">
               <TaskColumn

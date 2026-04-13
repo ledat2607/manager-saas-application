@@ -33,6 +33,7 @@ const DashboardIndex = () => {
     isPending: boolean;
   };
 
+
   if (!workspaceId || isPending) {
     return (
       <div className="p-6">

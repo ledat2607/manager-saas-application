@@ -3,37 +3,35 @@ import User from "../models/user.js";
 
 const authMiddleware = async (req, res, next) => {
   try {
-    // 1. Lấy token từ header (thường là 'authorization' hoặc 'auth')
-    const token = req.headers.authorization.split(" ")[1];
+    // 1. Kiểm tra xem header có tồn tại không trước khi split
+    const authHeader = req.headers.authorization;
 
-    // 2. Kiểm tra nếu không có token
-    if (!token) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         message: "Unauthorized: No token provided",
       });
     }
 
-    // 3. Verify token (thay 'YOUR_JWT_SECRET' bằng secret key của bạn)
+    // 2. Bây giờ mới an toàn để lấy token
+    const token = authHeader.split(" ")[1];
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //4 Tìm thông tin user
+
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return res.status(401).json({
-        message: "Unauthorized",
-      });
+      return res.status(401).json({ message: "User not found" });
     }
-    // 5. Lưu thông tin user đã decode vào object req để các API sau có thể dùng
+
     req.user = user;
-    // 6. Cho phép đi tiếp vào controller chính
     next();
   } catch (error) {
-    console.error("Auth Middleware Error:", error);
+    console.error("Auth Middleware Error:", error.message);
 
-    // Phân loại lỗi token
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });
     }
 
+    // Quan trọng: Trả về 401 đồng nhất để FE xử lý
     return res.status(401).json({
       message: "Unauthorized: Invalid token",
     });

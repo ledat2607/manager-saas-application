@@ -9,7 +9,7 @@ const Watchers = ({ watchers }: { watchers: User[] }) => {
       <div className="space-y-2">
         {watchers && watchers.length > 0 ? (
           watchers.map((watcher) => (
-            <div key={watcher._id}>
+            <div key={watcher._id} className="flex items-center gap-4">
               <Avatar title={watcher.name}>
                 <AvatarImage src={watcher.profilePicture} alt="" />
                 <AvatarFallback>{watcher.name.charAt(0)}</AvatarFallback>

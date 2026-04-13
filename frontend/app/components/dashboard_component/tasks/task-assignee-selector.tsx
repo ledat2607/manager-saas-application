@@ -13,12 +13,14 @@ const TaskAssigneeSelector = ({
   task,
   assignees,
   projectMembers,
+  isAssignees,
 }: {
   task: Task;
   assignees: User[];
   projectMembers: { user: User; role: ProjectMemberRole }[];
+  isAssignees?: boolean;
 }) => {
-  const { mutate, isPending } = useUpdateTaskAssignee();
+  const { mutate } = useUpdateTaskAssignee();
 
   const [dropdown, setDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>(
@@ -92,9 +94,9 @@ const TaskAssigneeSelector = ({
                   />
                   <AvatarFallback>{m.user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                {/* <span className="text-xs truncate text-muted-foreground">
+                <span className="text-xs truncate text-muted-foreground">
                   {m.user.name}
-                </span> */}
+                </span>
               </div>
             ))
         )}
@@ -102,8 +104,9 @@ const TaskAssigneeSelector = ({
       {/*Dropdowm */}
       <div className="relative">
         <Button
-          className="text-sm text-muted-foreground w-full border rounded px-2 py-1 text-left bg-white"
+          className="text-sm text-muted-foreground w-full border px-2 py-1 text-left bg-white hover:bg-blue-200 rounded-2xl"
           onClick={() => setDropdown(!dropdown)}
+          disabled={!isAssignees}
         >
           {selectedIds.length === 0
             ? "Select assignees"

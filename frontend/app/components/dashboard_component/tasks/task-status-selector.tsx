@@ -13,9 +13,10 @@ import { toast } from "sonner";
 interface TaskStatusSelectorProps {
   status: TaskStatus;
   taskId: string;
+  isAssigned?: boolean;
 }
 
-const TaskStatusSelector = ({ status, taskId }: TaskStatusSelectorProps) => {
+const TaskStatusSelector = ({ status, taskId, isAssigned }: TaskStatusSelectorProps) => {
   const { mutate, isPending } = useTaskUpdateStatus();
   const handleSelectStatus = (values: string) => {
     mutate(
@@ -39,7 +40,7 @@ const TaskStatusSelector = ({ status, taskId }: TaskStatusSelectorProps) => {
     <Select
       value={status || ""}
       onValueChange={handleSelectStatus}
-      disabled={isPending}
+      disabled={isPending || !isAssigned}
     >
       <SelectTrigger>
         <SelectValue placeholder="Status" />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bell, PlusCircle, Search, Check, PenLine } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -22,6 +22,8 @@ import {
   useSearchParams,
 } from "react-router";
 import { ModeToggle } from "../home_component/mode-toggle";
+import NotificationCard from "./notification-card";
+import { useGetNotifications } from "hook/use-user";
 
 interface HeaderDashboardProps {
   user: User | null;
@@ -37,23 +39,34 @@ const HeaderDashboard = ({
   selectedWorkspace,
 }: HeaderDashboardProps) => {
   const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
+
   const [searchParams, setSearchParams] = useSearchParams();
+  const workspaceId = searchParams.get("workspaceId");
+
+  const { data: notificationsData, isLoading } = useGetNotifications(
+    workspaceId!,
+  );
+
   const location = useLocation();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const { workspaceId: workspaceIdFromPath } = useParams();
+  const workspaceIdFromQuery = searchParams.get("workspaceId");
 
-  // 1. Tự động phục hồi hoặc set ID mặc định
   useEffect(() => {
-    // Chỉ xử lý khi ở trang Dashboard (không có /workspaces/ trong path)
-    const isDashboardPath =
-      location.pathname === "/dashboard" ||
-      location.pathname === "/my-teams" ||
-      location.pathname === "/";
+    const isWorkspacePath = location.pathname.startsWith("/workspaces");
+    const isGeneralDashboard = ["/dashboard", "/my-teams", "/"].includes(
+      location.pathname,
+    );
+
+    const isDashboardPath = isWorkspacePath || isGeneralDashboard;
 
     if (isDashboardPath && workspaces?.length > 0) {
       const lastId = localStorage.getItem("lastWorkspaceId");
-      const currentIdInUrl = searchParams.get("workspaceId");
 
-      if (!currentIdInUrl) {
+      const activeWorkspaceId = workspaceIdFromPath || workspaceIdFromQuery;
+
+      if (!activeWorkspaceId) {
         const idToSet =
           lastId && workspaces.some((ws) => ws._id === lastId)
             ? lastId
@@ -61,11 +74,24 @@ const HeaderDashboard = ({
 
         setSearchParams({ workspaceId: idToSet }, { replace: true });
       } else {
-        // Nếu URL có ID, cập nhật lại localStorage để đồng bộ
-        localStorage.setItem("lastWorkspaceId", currentIdInUrl);
+        localStorage.setItem("lastWorkspaceId", activeWorkspaceId);
+
+        const matchedWorkspace = workspaces.find(
+          (ws) => ws._id === activeWorkspaceId,
+        );
+        if (matchedWorkspace && selectedWorkspace?._id !== activeWorkspaceId) {
+          onWorkspaceSelected(matchedWorkspace);
+        }
       }
     }
-  }, [location.pathname, workspaces, searchParams, setSearchParams]);
+  }, [
+    location.pathname,
+    workspaces,
+    workspaceIdFromPath,
+    workspaceIdFromQuery,
+    searchParams,
+    selectedWorkspace,
+  ]);
 
   const handleSelect = (workspace: Workspace) => {
     onWorkspaceSelected(workspace);
@@ -175,8 +201,11 @@ const HeaderDashboard = ({
             size="icon"
             className="relative text-muted-foreground"
           >
-            <Bell className="h-6 w-6" />
-            <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background"></span>
+            <NotificationCard
+              isOpen={isOpen}
+              setIsOpen={() => setIsOpen(!isOpen)}
+              data={notificationsData}
+            />
           </Button>
           <UserMenu user={user} />
           <ModeToggle />

@@ -3,7 +3,7 @@ import ActivityLog from "../models/activity.js";
 import Project from "../models/project.js";
 import Task from "../models/task.js";
 import Workspace from "../models/workspace.js";
-
+import mongoose from "mongoose";
 import Comment from "../models/comment.js";
 
 const createTask = async (req, res) => {
@@ -74,7 +74,8 @@ const getTaskById = async (req, res) => {
     const { taskId } = req.params;
     const task = await Task.findById(taskId)
       .populate("assignees", "name email profilePicture")
-      .populate("watchers", "name email profilePicture");
+      .populate("watchers", "name email profilePicture")
+      .populate("createdBy", "name email profilePicture");
 
     if (!task) {
       return res.status(404).json({
@@ -145,7 +146,6 @@ const updateTaskStatus = async (req, res) => {
   try {
     const { taskId } = req.params;
     const { status } = req.body;
-    console.log(taskId, status);
 
     //1. Validate ID
     if (!taskId) {
@@ -172,6 +172,11 @@ const updateTaskStatus = async (req, res) => {
     }
     const oldStatus = task.status;
     task.status = status;
+
+    if (status === "Done") {
+      task.completedAt = new Date();
+    }
+
     await task.save();
 
     await recordActivity(req.user._id, "updated_task", "Task", taskId, {
@@ -608,6 +613,55 @@ const getMyTasks = async (req, res) => {
   }
 };
 
+const deleteTask = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { taskId } = req.params;
+
+    await Comment.deleteMany({ taskId: taskId }, { session });
+    await ActivityLog.deleteMany({ resourceId: taskId }, { session });
+
+    await Project.updateMany(
+      { tasks: taskId }, 
+      { $pull: { tasks: taskId } },
+      { session },
+    );
+
+    const task = await Task.findByIdAndDelete(taskId, { session });
+
+    if (!task) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    await session.commitTransaction();
+    session.endSession(); 
+
+    try {
+      await recordActivity(req.user._id, "deleted_task", "Task", taskId, {
+        details: `Task ${task.title} is deleted`,
+      });
+    } catch (logError) {
+      console.error("Ghi log lỗi nhưng task đã xóa xong:", logError);
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Task and related data deleted successfully" });
+  } catch (error) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    session.endSession();
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 export {
   createTask,
   getTaskById,
@@ -624,4 +678,5 @@ export {
   watchTask,
   archievedTask,
   getMyTasks,
+  deleteTask,
 };

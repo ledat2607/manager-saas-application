@@ -72,9 +72,12 @@ const getProjectById = async (req, res) => {
     const currentUserId = req.user?._id?.toString();
 
     const isMember = project.members.some((member) => {
-      // Kiểm tra xem member.user có tồn tại không sau khi populate
-      const memberId = member.user?._id?.toString() || member.user?.toString();
-      return memberId === currentUserId;
+      // Lấy ID ra một cách chắc chắn
+      const memberUserId = member.user?._id
+        ? member.user._id.toString()
+        : member.user?.toString();
+
+      return memberUserId === currentUserId;
     });
 
     if (!isMember) {
