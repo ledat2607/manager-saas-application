@@ -217,7 +217,7 @@ const Profile = () => {
         </TabsContent>
 
         <TabsContent value="security" className="mt-0 border-none outline-none">
-          <ChangePasswordCard />
+          <ChangePasswordCard user={data} />
         </TabsContent>
       </Tabs>
       <div className="flex justify-end">

@@ -5,9 +5,11 @@ import {
   changePassword,
   getNotifications,
   getUserProfile,
+  setup2FA,
   updatePicture,
   updateUserAdvancedDetails,
   updateUserProfile,
+  verifyAndEnable2FA,
 } from "../controllers/user-controller.js";
 import { z } from "zod";
 
@@ -79,6 +81,14 @@ router.put(
     }),
   }),
   updatePicture,
+);
+
+router.post("/setup-2fa", authMiddleware, setup2FA);
+router.post(
+  "/verify-2fa",
+  authMiddleware,
+  validateRequest({ body: z.object({ otp: z.string().length(6) }) }),
+  verifyAndEnable2FA,
 );
 
 export default router;

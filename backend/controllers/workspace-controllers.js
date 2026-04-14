@@ -320,7 +320,6 @@ const getWorkspaceStats = async (req, res) => {
 const acceptInviteToken = async (req, res) => {
   try {
     const { token } = req.body;
-    console.log("token", token);
     const decode = jwt.verify(token, process.env.JWT_SECRET);
 
     const { userId, workspaceId, role } = decode;

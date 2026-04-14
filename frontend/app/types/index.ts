@@ -13,6 +13,9 @@ export interface User {
     timezone?: string;
     backgroundImage?: string;
   };
+  twoFactor: {
+    isEnabled?: boolean;
+  };
 }
 
 export interface Workspace {

@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import ActivityLog from "../models/activity.js";
 import Project from "../models/project.js";
 import Task from "../models/task.js";
+import speakeasy from "speakeasy";
+import QRCode from "qrcode";
 
 const getUserProfile = async (req, res) => {
   try {
@@ -193,6 +195,58 @@ const updatePicture = async (req, res) => {
   }
 };
 
+const setup2FA = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    const secret = speakeasy.generateSecret({
+      name: `ManagerSaaS:${user.email}`,
+    });
+
+    user.twoFactor.secret = secret.base32;
+    user.twoFactor.setupExpiry = new Date(Date.now() + 2 * 60 * 1000);
+
+    await user.save();
+
+    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url || "");
+
+    res.status(200).json({
+      qrCode: qrCodeUrl,
+      secret: secret.base32,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Lỗi thiết lập 2FA" });
+  }
+};
+
+const verifyAndEnable2FA = async (req, res) => {
+  const { otp } = req.body;
+  console.log(otp);
+  try {
+    const user = await User.findById(req.user.id).select("+twoFactor.secret");
+
+    // Xác thực mã OTP
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactor.secret,
+      encoding: "base32",
+      token: otp,
+    });
+    console.log(verified);
+    if (verified) {
+      user.twoFactor.isEnabled = true;
+      await user.save();
+      res.status(200).json({ message: "2FA đã được kích hoạt thành công!" });
+    } else {
+      res
+        .status(400)
+        .json({ message: "Mã xác thực không đúng hoặc đã hết hạn" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Lỗi xác thực 2FA" });
+  }
+};
 export {
   getUserProfile,
   updateUserProfile,
@@ -200,4 +254,6 @@ export {
   getNotifications,
   updateUserAdvancedDetails,
   updatePicture,
+  setup2FA,
+  verifyAndEnable2FA,
 };

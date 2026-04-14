@@ -1,6 +1,6 @@
 import type { ChangePasswordFormData } from "@/components/dashboard_component/user/change-password-card";
 import type { ProfileFormData } from "@/components/dashboard_component/user/profile-card";
-import { getData, putData } from "@/lib/fetch-utils";
+import { getData, postData, putData } from "@/lib/fetch-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useGetProfileQuery = () => {
@@ -61,5 +61,17 @@ export const useUpdatePicture = () => {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["user", data._id] });
     },
+  });
+};
+
+export const useSetup2FA = () => {
+  return useMutation({
+    mutationFn: () => postData("/users/setup-2fa", {}),
+  });
+};
+
+export const useVerify2FA = () => {
+  return useMutation({
+    mutationFn: (otp: string) => postData("/users/verify-2fa", { otp }),
   });
 };

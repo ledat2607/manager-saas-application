@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema(
       isEnabled: { type: Boolean, default: false },
       secret: { type: String, select: false },
       otp: { type: String, select: false },
+      setupExpiry: { type: Date, select: false },
       otpExpiry: { type: Date, select: false },
     },
 
