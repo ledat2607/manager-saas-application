@@ -19,8 +19,9 @@ import {
   watchTask,
   getMyTasks,
   deleteTask,
+  uploadAttachment,
 } from "../controllers/task-controller.js";
-import { taskSchema } from "../libs/validate-schema.js";
+import { attachmentSchema, taskSchema } from "../libs/validate-schema.js";
 
 const router = express.Router();
 
@@ -169,6 +170,16 @@ router.delete(
   authMiddleware,
   validateRequest({ params: z.object({ taskId: z.string() }) }),
   deleteTask,
+);
+
+router.post(
+  "/:taskId/upload-attachment",
+  authMiddleware,
+  validateRequest({
+    params: z.object({ taskId: z.string() }),
+    body: attachmentSchema,
+  }),
+  uploadAttachment,
 );
 
 export default router;

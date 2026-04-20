@@ -22,7 +22,6 @@ const NotificationCard = ({
   setIsOpen,
   data = [],
 }: NotificationCardProps) => {
-  console.log(data);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>

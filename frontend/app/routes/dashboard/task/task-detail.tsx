@@ -1,50 +1,40 @@
-import { BackButton } from "@/components/dashboard_component/back-button";
 import CommentSection from "@/components/dashboard_component/tasks/comment-section";
-import DeleteDialog from "@/components/dashboard_component/tasks/delete-dialog";
 import SubtaskDetails from "@/components/dashboard_component/tasks/sub-task";
 import TaskActivity from "@/components/dashboard_component/tasks/task-activity";
 import TaskAssigneeSelector from "@/components/dashboard_component/tasks/task-assignee-selector";
+import TaskAttachment from "@/components/dashboard_component/tasks/task-attachments";
 import TaskDescription from "@/components/dashboard_component/tasks/task-desctiption";
 import TaskPrioritySelector from "@/components/dashboard_component/tasks/task-priority";
 import TaskStatusSelector from "@/components/dashboard_component/tasks/task-status-selector";
 import TaskTitle from "@/components/dashboard_component/tasks/task-tittle";
+import TopNavigation from "@/components/dashboard_component/tasks/top-navigation";
 import Watchers from "@/components/dashboard_component/tasks/watchers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { uploadFileToFirebase } from "@/lib/upload-image";
 import { userAuth } from "@/provider/auth-context";
-import type { Project, Task } from "@/types";
 import { formatDistanceToNow } from "date-fns";
-import {
-  useArchievedTask,
-  useDeleteTask,
-  useGetTaskQuery,
-  useWatchStatusTask,
-} from "hook/use-task";
-import {
-  AlignLeft,
-  ArrowLeft,
-  Calendar,
-  Clock,
-  Eye,
-  EyeOff,
-  Loader,
-  Trash2,
-  Archive,
-} from "lucide-react";
-import { useNavigate, useParams } from "react-router";
+import { useGetTaskQuery, useUploadAttachment } from "hook/use-task";
+import { AlignLeft, Calendar, Clock, Loader } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { toast } from "sonner";
 
 const TaskDetail = () => {
   const { user } = userAuth();
   const { taskId } = useParams<{ taskId: string }>();
-  const navigate = useNavigate();
 
-  const { mutate: watchTask, isPending: pendingWatch } = useWatchStatusTask();
-  const { mutate: archiveTask } = useArchievedTask();
   const { data, isLoading } = useGetTaskQuery(taskId!) as any;
-  const { mutate: deleteTask } = useDeleteTask();
+
+  useEffect(() => {
+    if (data?.task?.attachments) {
+      setAttachments(data.task.attachments);
+    }
+  }, [data]);
+  
+  const [attachments, setAttachments] = useState(data?.attachments);
+  const { mutate: uploadAttachment, isPending } = useUploadAttachment();
 
   if (isLoading)
     return (
@@ -54,90 +44,46 @@ const TaskDetail = () => {
     );
 
   const { task, project } = data;
-  const isUserWatching = task?.watchers?.some((w: any) => w?._id === user?._id);
   const isAssignee = task?.assignees?.some((a: any) => a._id === user?._id);
 
-  const isOwner = task.createdBy._id === user?._id;
-
-  const handleDelete = () => {
-    if (!isOwner) {
-      return toast.warning("Only task owner can delete the task");
+  const handleUpload = async (file: File) => {
+    if (!user?._id || !taskId) {
+      toast.error("You must be logged in to upload files");
+      return;
     }
-    deleteTask(
-      { taskId: taskId! },
-      {
-        onSuccess: () => {
-          toast.success("Task deleted successfully");
+
+    try {
+      const firebaseUrl = await uploadFileToFirebase(file, `tasks/${taskId}`);
+
+      uploadAttachment(
+        {
+          taskId: taskId!,
+          fileName: file.name,
+          fileUrl: firebaseUrl, // Link download
+          fileType: file.type,
+          fileSize: file.size,
+          uploadedBy: user?._id,
+          uploadedAt: new Date().toISOString(),
         },
-        onError: () => {
-          toast.error("Failed to delete task");
+        {
+          onSuccess: (response: any) => {
+            const newAttachment = response.attachment || response;
+            setAttachments((prev: any) => [...(prev || []), newAttachment]);
+
+            toast.success("File uploaded successfully");
+          },
         },
-        onSettled: () => {
-          navigate(-1);
-        },
-      },
-    );
+      );
+    } catch (error) {
+      console.error("Lỗi upload:", error);
+      toast.error("Failed to upload file.");
+    }
   };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-10">
       {/* Top Navigation Bar */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200 mr-2 py-3 mb-6">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="hover:bg-slate-100 text-slate-600"
-            >
-              <ArrowLeft className="mr-2 size-4" /> Back
-            </Button>
-            <Separator orientation="vertical" className="h-4" />
-            <span className="text-sm font-medium text-slate-500">
-              {project.name}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              title={isUserWatching ? "Unwatch" : "Watch"}
-              variant="outline"
-              size="sm"
-              onClick={() => watchTask({ taskId: task._id })}
-              disabled={pendingWatch}
-              className={
-                isUserWatching ? "bg-blue-50 text-blue-600 border-blue-200" : ""
-              }
-            >
-              {isUserWatching ? (
-                <EyeOff className="lg:mr-2 size-4" />
-              ) : (
-                <Eye className="lg:mr-2 size-4" />
-              )}
-              <p className="hidden lg:block">
-                {isUserWatching ? "Unwatch" : "Watch"}
-              </p>
-            </Button>
-            <Button
-              title={task.isArchived ? "Restore" : "Archive"}
-              variant="outline"
-              size="sm"
-              onClick={() => archiveTask({ taskId: task._id })}
-              className={
-                task.isArchived
-                  ? "bg-amber-50 text-amber-600 border-amber-200"
-                  : ""
-              }
-            >
-              <Archive className="lg:mr-2 size-4" />
-              <p className="hidden lg:block">
-                {task.isArchived ? "Restore" : "Archive"}
-              </p>
-            </Button>
-            <DeleteDialog taskId={task._id} onDelete={handleDelete} />
-          </div>
-        </div>
-      </div>
+      <TopNavigation task={task} user={user as any} />
 
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -284,7 +230,16 @@ const TaskDetail = () => {
                 <Watchers watchers={task?.watchers || []} />
               </div>
             </div>
-
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+              <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">
+                Attachments
+              </h3>
+              <TaskAttachment
+                data={attachments || []}
+                onUpload={handleUpload}
+                isUploading={isPending}
+              />
+            </div>
             {/* Activity Feed */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
               <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">

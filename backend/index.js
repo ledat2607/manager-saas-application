@@ -17,6 +17,7 @@ const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
+
 // 1. CẤU HÌNH MIDDLEWARE (Phải đặt trước Routes)
 app.use(
   cors({

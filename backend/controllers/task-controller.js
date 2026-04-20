@@ -270,7 +270,7 @@ const updateTaskAssignees = async (req, res) => {
     await task.save();
 
     await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-      details: `update task description from ${oldAssignees.length} to ${assignees}`,
+      details: `Update task assignees from ${oldAssignees.length} to ${assignees.length} assignees`,
     });
     res.status(200).json(task);
   } catch (error) {
@@ -624,7 +624,7 @@ const deleteTask = async (req, res) => {
     await ActivityLog.deleteMany({ resourceId: taskId }, { session });
 
     await Project.updateMany(
-      { tasks: taskId }, 
+      { tasks: taskId },
       { $pull: { tasks: taskId } },
       { session },
     );
@@ -638,7 +638,7 @@ const deleteTask = async (req, res) => {
     }
 
     await session.commitTransaction();
-    session.endSession(); 
+    session.endSession();
 
     try {
       await recordActivity(req.user._id, "deleted_task", "Task", taskId, {
@@ -661,6 +661,51 @@ const deleteTask = async (req, res) => {
   }
 };
 
+const uploadAttachment = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { fileName, fileUrl, fileType, fileSize, uploadedBy, uploadedAt } =
+      req.body;
+
+    console.log({
+      fileName,
+      fileUrl,
+      fileType,
+      fileSize,
+      uploadedBy,
+      uploadedAt,
+    });
+
+    //1. Validate taskId
+    if (!taskId) {
+      return res.status(400).json({ message: "Invalid task ID" });
+    }
+
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    task.attachments.push({
+      fileName,
+      fileUrl,
+      fileType,
+      fileSize,
+      uploadedBy,
+      uploadedAt,
+    });
+    await task.save();
+
+    await recordActivity(req.user._id, "added_attachment", "Task", taskId, {
+      details: `added new attachment ${fileName}`,
+    });
+    res.status(200).json({ message: "Attachment uploaded successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export {
   createTask,
@@ -679,4 +724,5 @@ export {
   archievedTask,
   getMyTasks,
   deleteTask,
+  uploadAttachment,
 };

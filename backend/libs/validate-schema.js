@@ -72,6 +72,15 @@ const taskSchema = z.object({
   assignees: z.array(z.string()).min(1, "At least one assignee is required"),
 });
 
+const attachmentSchema = z.object({
+  fileName: z.string(),
+  fileUrl: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+  uploadedBy: z.string(),
+  uploadedAt: z.string(),
+});
+
 export {
   registerSchema,
   loginSchema,
@@ -83,4 +92,5 @@ export {
   taskSchema,
   inviteMemberSchema,
   tokenSchema,
+  attachmentSchema,
 };

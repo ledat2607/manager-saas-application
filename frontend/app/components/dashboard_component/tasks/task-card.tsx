@@ -1,158 +1,163 @@
 import React from "react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Task } from "@/types";
-import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Calendar,
+  MoreHorizontal,
+  MessageSquare,
+  CheckSquare,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
   const getPriorityStyles = (priority: string) => {
     switch (priority) {
       case "High":
-        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+        return "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-950/30 dark:text-rose-400";
       case "Medium":
-        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+        return "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400";
       default:
-        return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400";
+        return "bg-slate-50 text-slate-600 border-slate-100 dark:bg-slate-800 dark:text-slate-400";
     }
   };
 
+  const completedSubtasks =
+    task.subtasks?.filter((s) => s.completed).length || 0;
+  const totalSubtasks = task.subtasks?.length || 0;
+  const progressPercent =
+    totalSubtasks > 0
+      ? Math.round((completedSubtasks / totalSubtasks) * 100)
+      : 0;
+
   return (
-    <Card
-      onClick={onClick}
-      className="group p-2 cursor-pointer border-none bg-white dark:bg-card shadow-sm hover:shadow-xl transition-all duration-300 ring-1 ring-slate-200 dark:ring-slate-800 hover:ring-primary/50"
-    >
-      <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <Badge
-            className={cn(
-              "font-semibold text-xs text-white shadow-none border-none rounded-md px-2.5 py-0.5",
-              getPriorityStyles(task.priority),
-            )}
-          >
-            {task.priority}
-          </Badge>
+    <TooltipProvider>
+      <Card
+        onClick={onClick}
+        className="group relative flex flex-col overflow-hidden border border-slate-200 bg-white p-3.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+      >
+        {/* Subtle Side Accent for Priority */}
+        <div
+          className={cn(
+            "absolute left-0 top-0 h-full w-[3px] opacity-0 transition-opacity group-hover:opacity-100",
+            task.priority === "High"
+              ? "bg-rose-500"
+              : task.priority === "Medium"
+                ? "bg-amber-500"
+                : "bg-slate-400",
+          )}
+        />
 
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            {task.status !== "To Do" && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-7 rounded-full hover:bg-slate-100"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log("to do");
-                }}
-              >
-                <AlertCircle className="size-4 text-slate-500" />
-              </Button>
-            )}
-            {task.status !== "In Progress" && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-7 rounded-full hover:bg-blue-50 hover:text-blue-600"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log("in progress");
-                }}
-              >
-                <Clock className="size-4" />
-              </Button>
-            )}
-            {task.status !== "Done" && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-7 rounded-full hover:bg-green-50 hover:text-green-600"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log("done");
-                }}
-              >
-                <CheckCircle className="size-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="px-2">
-        <h4 className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors">
-          {task.title}
-        </h4>
-
-        {task.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-4">
-            {task.description}
-          </p>
-        )}
-
-        {/* Tiến độ subtasks (Progress Bar nhìn sẽ hiện đại hơn text thuần) */}
-        {task.subtasks && task.subtasks.length > 0 && (
-          <div className="mb-4 space-y-1.5">
-            <div className="flex justify-between text-[10px] font-medium uppercase tracking-wider text-slate-400">
-              <span>Progress</span>
-              <span>
-                {Math.round(
-                  (task.subtasks.filter((s) => s.completed).length /
-                    task.subtasks.length) *
-                    100,
-                )}
-                %
-              </span>
-            </div>
-            <div className="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary transition-all duration-500"
-                style={{
-                  width: `${(task.subtasks.filter((s) => s.completed).length / task.subtasks.length) * 100}%`,
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-50 dark:border-slate-800">
-          <div className="flex -space-x-2">
-            {task.assignees?.slice(0, 3).map((member) => (
-              <Avatar
-                key={member._id}
-                className="size-7 ring-2 ring-background"
-              >
-                <AvatarImage src={member.profilePicture} />
-                <AvatarFallback className="text-[10px]">
-                  {member.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-            ))}
-            {task.assignees && task.assignees.length > 3 && (
-              <div className="size-7 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-background flex items-center justify-center text-[10px] font-medium text-slate-500">
-                +{task.assignees.length - 3}
-              </div>
-            )}
-          </div>
-
-          {task.dueDate && (
-            <div
+        <div className="space-y-3">
+          {/* Header: Priority & Quick Actions */}
+          <div className="flex items-center justify-between">
+            <Badge
+              variant="outline"
               className={cn(
-                "flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-md",
-                new Date(task.dueDate) < new Date()
-                  ? "text-red-500 bg-red-50"
-                  : "text-slate-500 bg-slate-50",
+                "rounded-md px-2 py-0 text-[10px] font-bold uppercase tracking-wider shadow-none",
+                getPriorityStyles(task.priority),
               )}
             >
-              <Calendar className="size-3" />
-              {format(new Date(task.dueDate), "MMM d")}
+              {task.priority}
+            </Badge>
+            <button className="text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-slate-600 dark:hover:text-slate-200">
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Title & Description */}
+          <div className="space-y-1">
+            <h4 className="text-[14px] font-semibold leading-tight text-slate-900 transition-colors group-hover:text-primary dark:text-slate-100">
+              {task.title}
+            </h4>
+            {task.description && (
+              <p className="line-clamp-2 text-[12px] leading-relaxed text-muted-foreground">
+                {task.description}
+              </p>
+            )}
+          </div>
+
+          {/* Subtask Progress Mini-Bar */}
+          {totalSubtasks > 0 && (
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-tighter text-slate-400">
+                <div className="flex items-center gap-1">
+                  <CheckSquare className="h-3 w-3" />
+                  <span>
+                    {completedSubtasks}/{totalSubtasks} Subtasks
+                  </span>
+                </div>
+                <span>{progressPercent}%</span>
+              </div>
+              <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <div
+                  className={cn(
+                    "h-full transition-all duration-500",
+                    progressPercent === 100 ? "bg-emerald-500" : "bg-primary",
+                  )}
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
             </div>
           )}
+
+          {/* Footer: Assignees & Meta */}
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center -space-x-2">
+              {task.assignees?.slice(0, 3).map((member) => (
+                <Tooltip key={member._id}>
+                  <TooltipTrigger asChild>
+                    <Avatar className="h-6 w-6 border-2 border-white ring-offset-background transition-transform hover:z-10 hover:scale-110 dark:border-slate-950">
+                      <AvatarImage src={member.profilePicture} />
+                      <AvatarFallback className="bg-slate-100 text-[10px] font-bold">
+                        {member.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">{member.name}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+              {task.assignees && task.assignees.length > 3 && (
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-slate-50 text-[9px] font-bold text-slate-500 dark:border-slate-950 dark:bg-slate-800">
+                  +{task.assignees.length - 3}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 text-slate-400">
+            
+              <div className="flex items-center gap-1 text-[11px]">
+              
+              </div>
+
+              {task.dueDate && (
+                <div
+                  className={cn(
+                    "flex items-center gap-1 text-[11px] font-medium",
+                    new Date(task.dueDate) < new Date()
+                      ? "text-rose-500"
+                      : "text-slate-500",
+                  )}
+                >
+                  <Calendar className="h-3 w-3" />
+                  <span>{format(new Date(task.dueDate), "MMM d")}</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+    </TooltipProvider>
   );
 };
 

@@ -47,11 +47,11 @@ const ProjectCard = ({
     const diffTime = due.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return "overdue"; // Đã quá hạn
-    if (diffDays <= 3) return "urgent"; // Sắp hết hạn (trong 3 ngày)
-    return "normal"; // Còn nhiều thời gian
+    if (diffDays < 0) return "overdue";
+    if (diffDays <= 3) return "urgent";
+    return "normal";
   };
-
+  console.log(project);
   const statusConfig = {
     overdue: "text-red-600 dark:text-red-400 font-bold animate-pulse",
     urgent: "text-amber-600 dark:text-amber-400 font-medium",
@@ -62,21 +62,29 @@ const ProjectCard = ({
   const formattedDate = new Date(project.dueDate).toLocaleDateString("vi-VN");
   return (
     <Link to={`/workspaces/${workspaceId}/projects/${project._id}`}>
-      <Card className="transition-all duration-300 hover:translate-y-1 hover:shadow-lg mt-4 p-3">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-xl font-bold">
+      <Card className="group relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-md">
+        <div
+          className={cn(
+            "absolute top-0 left-0 h-1 w-full",
+            badgeStyle.split(" ")[0],
+          )}
+        />
+        {/* Header: Chống vỡ Badge và Title */}
+        <CardHeader className="p-4 pb-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              {" "}
+              {/* min-w-0 giúp text-truncate hoạt động */}
+              <CardTitle className="truncate text-base font-bold transition-colors group-hover:text-blue-600">
                 {project.title}
               </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                {project.description}
+              <CardDescription className="line-clamp-1 text-xs">
+                {project.description || "No description"}
               </CardDescription>
             </div>
             <Badge
-              variant="outline"
               className={cn(
-                "px-2 py-0.5 rounded-full font-medium shadow-sm text-xs",
+                "shrink-0 whitespace-nowrap px-2 py-0 text-[10px]",
                 badgeStyle,
               )}
             >
@@ -84,51 +92,46 @@ const ProjectCard = ({
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="p-0">
-          <div className="space-y-4">
-            <div className="space-y-1">
-              {/*Progress bar */}
-              <div className="flex justify-between text-xs items-center">
-                <span>Progress:</span>
-                <div className="w-full ml-2 flex items-center space-x-2">
-                  <Progress value={progress} />
-                  <span className="text-muted-foreground text-balance">
-                    {progress}%
+
+        <CardContent className="flex-1 p-4 pt-0">
+          <div className="flex flex-col gap-4">
+            {/* Progress: Tách biệt rõ ràng */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground">
+                <span>Tiến độ</span>
+                <span>{progress}%</span>
+              </div>
+              <Progress value={progress} className="h-1.5" />
+            </div>
+
+            {/* Footer: Dùng flex-wrap để tự xuống dòng khi thiếu chỗ */}
+            <div className="flex flex-wrap items-center justify-between gap-y-2 border-t pt-3">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">
+                  {project.tasks.length}
+                </span>
+                <span>Tasks</span>
+              </div>
+
+              {project.dueDate && (
+                <div
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium",
+                    dueStatus === "overdue"
+                      ? "bg-red-50 text-red-600"
+                      : "bg-slate-50 text-slate-500",
+                  )}
+                >
+                  {dueStatus === "overdue" && (
+                    <AlertCircle className="h-3 w-3" />
+                  )}
+                  <span className="whitespace-nowrap">
+                    {dueStatus === "overdue"
+                      ? `Quá hạn: ${formattedDate}`
+                      : formattedDate}
                   </span>
                 </div>
-              </div>
-
-              {/* Task count */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm gap-2 text-muted-foreground">
-                  <span>{project.tasks.length}</span>
-                  <span>Tasks</span>
-                </div>
-
-                {/* Due date */}
-                {project.dueDate && (
-                  <div className="flex items-center gap-1.5">
-                    {/* Thêm icon để cảnh báo trực quan hơn */}
-                    {dueStatus === "overdue" && (
-                      <AlertCircle className="h-3.5 w-3.5 text-red-500" />
-                    )}
-                    {dueStatus === "urgent" && (
-                      <Clock className="h-3.5 w-3.5 text-amber-500" />
-                    )}
-
-                    <span
-                      className={cn(
-                        "text-xs transition-colors",
-                        statusConfig[dueStatus],
-                      )}
-                    >
-                      {dueStatus === "overdue"
-                        ? `Quá hạn: ${formattedDate}`
-                        : formattedDate}
-                    </span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         </CardContent>

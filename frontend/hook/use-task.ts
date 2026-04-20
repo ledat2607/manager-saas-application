@@ -221,3 +221,35 @@ export const useDeleteTask = () => {
     },
   });
 };
+
+export const useUploadAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      taskId: string;
+      fileName: string;
+      fileUrl: string;
+      fileType: string;
+      fileSize: number;
+      uploadedBy: string;
+      uploadedAt: string;
+    }) =>
+      postData(`/tasks/${data.taskId}/upload-attachment`, {
+        fileName: data.fileName,
+        fileUrl: data.fileUrl,
+        fileType: data.fileType,
+        fileSize: data.fileSize,
+        uploadedBy: data.uploadedBy,
+        uploadedAt: data.uploadedAt,
+      }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data.taskId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data.taskId],
+      });
+    },
+  });
+};

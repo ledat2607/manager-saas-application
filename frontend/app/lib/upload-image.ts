@@ -56,3 +56,28 @@ export const deleteFileFromCloud = async (fileUrl: string) => {
     }
   }
 };
+
+export const uploadFileToFirebase = (
+  file: File,
+  path: string,
+  onProgress?: (progress: number) => void,
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const storageRef = ref(storage, `${file.name}-${path}/${Date.now()}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        if (onProgress) onProgress(progress);
+      },
+      (error) => reject(error),
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve(downloadURL);
+      },
+    );
+  });
+};

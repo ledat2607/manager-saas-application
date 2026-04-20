@@ -46,7 +46,14 @@ const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
         className={`flex items-center gap-4 pb-6 ${isCollapsed ? "justify-center" : ""}`}
       >
         <img src="./logoTM.png" alt="Logo" className="w-8" />
-        {!isCollapsed && <span className="font-bold">Task Manager</span>}
+        {!isCollapsed && (
+          <span
+            className="font-bold cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            Task Manager
+          </span>
+        )}
       </div>
 
       <Separator />

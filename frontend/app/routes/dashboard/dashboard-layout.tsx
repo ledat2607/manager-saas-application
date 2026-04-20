@@ -1,6 +1,12 @@
 import { userAuth } from "@/provider/auth-context";
 import React, { useEffect, useMemo, useState } from "react";
-import { Navigate, Outlet, useLoaderData, useSearchParams } from "react-router";
+import {
+  Navigate,
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeaderDashboard from "@/components/dashboard_component/header";
 
@@ -25,21 +31,17 @@ const DashboardLayout = () => {
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const {
-    user,
-    logout,
-    isAuthenticated,
-    isLoading: isAuthLoading,
-  } = userAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = userAuth();
   const [isMinimumTimePassed, setIsMinimumTimePassed] = useState(false);
   const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const workspaceIdFromUrl = searchParams.get("workspaceId");
   const currentWorkspace = useMemo(() => {
     if (!workspaces) return null;
-    // Nếu có ID trên URL, tìm cái đó. Nếu không, mặc định lấy cái đầu tiên
     return workspaces.find((ws) => ws._id === workspaceIdFromUrl);
   }, [workspaces, workspaceIdFromUrl]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMinimumTimePassed(true);
@@ -77,7 +79,16 @@ const DashboardLayout = () => {
         <HeaderDashboard
           onCreateWorkspace={() => setIsCreatingWorkspace(true)}
           user={user}
-          onWorkspaceSelected={() => {}}
+          onWorkspaceSelected={(workspace) => {
+            localStorage.setItem("lastWorkspaceId", workspace._id);
+            if (location.pathname.startsWith("/workspaces")) {
+              navigate(`/workspaces/${workspace._id}`);
+            } else {
+              navigate(`${location.pathname}?workspaceId=${workspace._id}`, {
+                replace: true,
+              });
+            }
+          }}
           selectedWorkspace={currentWorkspace || null}
         />
 

@@ -5,6 +5,7 @@ import WorkspaceInvite from "../models/workspace-invite.js";
 import jwt from "jsonwebtoken";
 import { sendWorkspaceInviteEmail } from "../libs/send-email.js";
 import { recordActivity } from "../libs/index.js";
+import Task from "../models/task.js";
 const createWorkspace = async (req, res) => {
   try {
     const { name, color, description } = req.body;
@@ -34,23 +35,41 @@ const createWorkspace = async (req, res) => {
   }
 };
 
+// Backend: controller file
 const getWorkspaces = async (req, res) => {
   try {
-    const workspaces = await Workspace.find({
-      "members.user": req.user._id,
-    })
-      .populate({
-        path: "members.user", // 1. Chỉ định trường chứa ID cần populate
-        select: "name email profilePicture", // 2. Chỉ lấy các trường cần thiết (bảo mật)
-      })
-      .sort({ createdAt: -1 });
+    const workspaces = await Workspace.find({ "members.user": req.user._id })
+      .populate({ path: "members.user", select: "name email profilePicture" })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    res.status(200).json({ workspaces }); // Thường lấy dữ liệu dùng 200 (OK) thay vì 201 (Created)
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    const workspaceIds = workspaces.map((ws) => ws._id);
+
+    const projects = await Project.find({
+      workspace: { $in: workspaceIds },
+    }).lean();
+    const projectIds = projects.map((p) => p._id);
+    const tasks = await Task.find({ project: { $in: projectIds } }).lean();
+
+    const detailedWorkspaces = workspaces.map((ws) => {
+      const wsProjects = projects.filter(
+        (p) => p.workspace?.toString() === ws._id.toString(),
+      );
+      const projectsWithTasks = wsProjects.map((p) => ({
+        ...p,
+        tasks: tasks.filter((t) => t.project?.toString() === p._id.toString()),
+      }));
+
+      return {
+        ...ws,
+        projects: projectsWithTasks,
+      };
     });
+
+    res.status(200).json({ workspaces: detailedWorkspaces });
+  } catch (error) {
+    console.error("Lỗi getWorkspaces:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -378,7 +397,6 @@ const acceptInviteToken = async (req, res) => {
       }),
     );
 
-    
     await Promise.all([
       WorkspaceInvite.deleteOne({ _id: inviteInfo._id }),
       User.findByIdAndUpdate(userId, { $push: { workspaces: workspaceId } }),

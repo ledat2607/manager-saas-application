@@ -95,13 +95,7 @@ const HeaderDashboard = ({
 
   const handleSelect = (workspace: Workspace) => {
     onWorkspaceSelected(workspace);
-    localStorage.setItem("lastWorkspaceId", workspace._id); // Lưu lại ngay khi chọn
-
-    if (location.pathname.includes("/workspaces/")) {
-      navigate(`/workspaces/${workspace._id}`);
-    } else {
-      setSearchParams({ workspaceId: workspace._id });
-    }
+    setIsOpen(false);
   };
   return (
     <div className="sticky top-0 bg-background/80 backdrop-blur-md z-40 border-b justify-between flex items-center p-3.5">
